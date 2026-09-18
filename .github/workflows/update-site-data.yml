@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
 
@@ -40,18 +40,6 @@ jobs:
           node automation/update-site-data.mjs
           --config automation/github-pages-config.json
           --env /dev/null
-
-      - name: Commit updated data
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/site-data.js
-          if git diff --cached --quiet; then
-            echo "Site data is already current."
-          else
-            git commit -m "Update GitHub status"
-            git push
-          fi
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5

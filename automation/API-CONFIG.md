@@ -141,7 +141,7 @@ journalctl --user -u player-home-update.service -n 50 --no-pager
 
 ## 7. GitHub Pages 自动更新
 
-仓库中的 `.github/workflows/update-site-data.yml` 会在每天北京时间 03:00 运行，拉取 GitHub 状态，把新的 `data/site-data.js` 提交回 `main` 分支，并直接部署站点。这个流程不依赖本机开机。
+仓库中的 `.github/workflows/update-site-data.yml` 会在每天北京时间 03:00 运行，拉取 GitHub 状态，在 Actions 环境中生成新的 `data/site-data.js` 并直接部署站点。它不会向 `main` 分支提交生成文件，因此不会造成日常本地推送冲突。这个流程不依赖本机开机。
 
 默认使用 Actions 自动提供的临时 Token，它只能读取公开贡献，因此贡献数和连续天数可能低于本地 PAT 的结果。若要让线上数据与本地一致，在仓库 `Settings -> Secrets and variables -> Actions` 中新建 Repository secret：
 
