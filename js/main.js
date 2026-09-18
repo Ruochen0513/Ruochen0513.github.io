@@ -140,11 +140,16 @@ const contributionGrid = document.querySelector("[data-contribution-grid]");
 if (contributionGrid) {
   const activityPattern = [0, 0, 1, 0, 2, 0, 1, 3, 0, 0, 2, 1, 0, 4, 0, 1, 2];
   const liveGrid = config.github.contributionGrid || [];
-  for (let index = 0; index < 182; index += 1) {
+  const cellCount = liveGrid.length || 364;
+  const weekCount = Math.ceil(cellCount / 7);
+  contributionGrid.parentElement?.style.setProperty("--week-count", String(weekCount));
+  contributionGrid.parentElement?.style.setProperty("--contribution-width", `${weekCount * 13 - 3}px`);
+  for (let index = 0; index < cellCount; index += 1) {
     const cell = document.createElement("i");
-    const level = liveGrid[index] ?? activityPattern[(index * 7 + Math.floor(index / 11)) % activityPattern.length];
+    const count = liveGrid[index] ?? activityPattern[(index * 7 + Math.floor(index / 11)) % activityPattern.length];
+    const level = count === 0 ? 0 : count === 1 ? 1 : count <= 3 ? 2 : count <= 6 ? 3 : 4;
     cell.dataset.level = String(level);
-    cell.title = liveGrid.length ? `贡献数 ${level}` : `演示贡献等级 ${level}`;
+    cell.title = liveGrid.length ? `贡献数 ${count}` : `演示贡献等级 ${level}`;
     contributionGrid.appendChild(cell);
   }
 }

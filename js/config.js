@@ -73,7 +73,7 @@ window.PLAYER_HOME_CONFIG = {
       streak: { value: "--", label: "连续天数" },
       repositories: { value: "--", label: "公开仓库" },
     },
-    months: ["APR", "MAY", "JUN", "JUL", "AUG", "SEP"],
+    months: ["OCT", "NOV", "DEC", "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP"],
     commits: [
       { title: "等待接入真实提交记录", source: "GitHub Events API", time: "--" },
       { title: "仓库与提交信息将在这里显示", source: "repository / commit", time: "--" },

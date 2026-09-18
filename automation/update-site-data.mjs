@@ -106,7 +106,7 @@ function buildMonths() {
   const months = [];
   const formatter = new Intl.DateTimeFormat("en-US", { month: "short" });
   const now = new Date();
-  for (let index = 5; index >= 0; index -= 1) {
+  for (let index = 11; index >= 0; index -= 1) {
     const date = new Date(now.getFullYear(), now.getMonth() - index, 1);
     months.push(formatter.format(date).toUpperCase());
   }
@@ -158,20 +158,28 @@ async function updateGithub(source, env, statuses) {
 
     if (token) {
       const to = new Date();
-      const from = new Date(Date.UTC(to.getUTCFullYear(), 0, 1));
+      const yearStart = new Date(Date.UTC(to.getUTCFullYear(), 0, 1));
+      const calendarFrom = new Date(to);
+      calendarFrom.setUTCFullYear(calendarFrom.getUTCFullYear() - 1);
       const graphql = await fetchJson("https://api.github.com/graphql", {
         token,
         method: "POST",
         body: {
-          query: `query($login:String!,$from:DateTime!,$to:DateTime!){user(login:$login){contributionsCollection(from:$from,to:$to){contributionCalendar{totalContributions weeks{contributionDays{contributionCount date}}}}}}`,
-          variables: { login: source.username, from: from.toISOString(), to: to.toISOString() },
+          query: `query($login:String!,$yearStart:DateTime!,$calendarFrom:DateTime!,$to:DateTime!){user(login:$login){yearToDate:contributionsCollection(from:$yearStart,to:$to){contributionCalendar{totalContributions}} rollingYear:contributionsCollection(from:$calendarFrom,to:$to){contributionCalendar{weeks{contributionDays{contributionCount date}}}}}}`,
+          variables: {
+            login: source.username,
+            yearStart: yearStart.toISOString(),
+            calendarFrom: calendarFrom.toISOString(),
+            to: to.toISOString(),
+          },
         },
       });
-      const collection = graphql.data?.user?.contributionsCollection;
-      const grid = collection?.contributionCalendar?.weeks?.flatMap((week) => week.contributionDays.map((day) => day.contributionCount)).slice(-182) || [];
+      const user = graphql.data?.user;
+      const calendar = user?.rollingYear?.contributionCalendar;
+      const grid = calendar?.weeks?.flatMap((week) => week.contributionDays.map((day) => day.contributionCount)) || [];
       if (grid.length) {
         base.contributionGrid = grid;
-        base.metrics.contributions.value = text(collection.contributionCalendar.totalContributions, "--");
+        base.metrics.contributions.value = text(user?.yearToDate?.contributionCalendar?.totalContributions, "--");
         base.metrics.streak.value = String(currentStreak(grid));
         statuses.github.message = "REST profile, events, and GraphQL contributions updated";
       }

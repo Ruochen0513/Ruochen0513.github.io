@@ -325,9 +325,9 @@ img { display: block; max-width: 100%; }
 .integration-note > span:first-child { width: 8px; height: 8px; flex: 0 0 auto; background: var(--yellow); }
 .contribution-panel, .commit-panel { min-width: 0; padding: 20px; }
 .contribution-panel .panel-title, .commit-panel .panel-title { padding-top: 0; border-bottom: 1px solid var(--line); }
-.contribution-wrap { overflow-x: auto; padding: 19px 0 10px; scrollbar-width: thin; }
-.contribution-months { display: grid; min-width: 594px; margin: 0 0 7px 0; grid-template-columns: repeat(6,1fr); color: var(--dim); font-size: 8px; }
-.contribution-grid { display: grid; width: 594px; grid-auto-flow: column; grid-template-rows: repeat(7, 10px); grid-auto-columns: 10px; gap: 3px; }
+.contribution-wrap { --contribution-width: 673px; overflow-x: auto; padding: 19px 0 10px; scrollbar-width: thin; }
+.contribution-months { display: grid; width: var(--contribution-width); margin: 0 0 7px; grid-template-columns: repeat(12,1fr); color: var(--dim); font-size: 8px; }
+.contribution-grid { display: grid; width: var(--contribution-width); grid-auto-flow: column; grid-template-rows: repeat(7, 10px); grid-auto-columns: 10px; gap: 3px; }
 .contribution-grid i, .contribution-legend i { display: block; background: #262733; }
 .contribution-grid i[data-level="1"],.contribution-legend i[data-level="1"] { background: #352758; }
 .contribution-grid i[data-level="2"],.contribution-legend i[data-level="2"] { background: #543b86; }
@@ -429,6 +429,16 @@ img { display: block; max-width: 100%; }
   .crosshair-info { padding-top: 28px; }
   .crosshair-info h3 { font-size: 20px; }
   .contribution-panel, .commit-panel { padding: 14px; }
+  .contribution-wrap { overflow-x: hidden; }
+  .contribution-months, .contribution-grid { width: 100%; }
+  .contribution-months { font-size: 7px; }
+  .contribution-months span:nth-child(even) { visibility: hidden; }
+  .contribution-grid {
+    grid-template-columns: repeat(var(--week-count), minmax(0, 1fr));
+    grid-template-rows: repeat(7, 5px);
+    grid-auto-columns: auto;
+    gap: 2px;
+  }
   .github-metrics strong { font-size: 23px; }
   .feed-toolbar { align-items: flex-start; flex-direction: column; }
   .feed-item { min-height: 135px; grid-template-columns: 42px minmax(0,1fr); gap: 15px; }
