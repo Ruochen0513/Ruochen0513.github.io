@@ -1,0 +1,47 @@
+{
+  "timezone": "Asia/Shanghai",
+  "github": {
+    "enabled": true,
+    "username": "YOUR_GITHUB_USERNAME",
+    "tokenEnv": "GITHUB_TOKEN",
+    "eventsLimit": 8
+  },
+  "social": {
+    "bilibili": {
+      "enabled": false,
+      "platform": "哔哩哔哩",
+      "url": "https://your-json-endpoint.example/bilibili",
+      "tokenEnv": "BILIBILI_TOKEN",
+      "itemsPath": "items",
+      "defaultType": "VIDEO",
+      "fieldMap": { "title": "title", "summary": "description", "time": "published_at", "url": "url" }
+    },
+    "weibo": {
+      "enabled": false,
+      "platform": "微博",
+      "url": "https://your-json-endpoint.example/weibo",
+      "tokenEnv": "WEIBO_TOKEN",
+      "itemsPath": "items",
+      "defaultType": "POST",
+      "fieldMap": { "title": "text", "summary": "text", "time": "created_at", "url": "url" }
+    },
+    "netease": {
+      "enabled": false,
+      "platform": "网易云音乐",
+      "url": "https://your-json-endpoint.example/netease",
+      "tokenEnv": "NETEASE_TOKEN",
+      "itemsPath": "items",
+      "defaultType": "MUSIC",
+      "fieldMap": { "title": "name", "summary": "artist", "time": "created_at", "url": "url" }
+    },
+    "instagram": {
+      "enabled": false,
+      "platform": "Instagram",
+      "url": "https://your-json-endpoint.example/instagram",
+      "tokenEnv": "INSTAGRAM_TOKEN",
+      "itemsPath": "items",
+      "defaultType": "PHOTO",
+      "fieldMap": { "title": "caption", "summary": "caption", "time": "timestamp", "url": "permalink" }
+    }
+  }
+}

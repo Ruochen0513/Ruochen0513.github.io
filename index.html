@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="个人主页，集中展示个人信息、外设、无畏契约准星、GitHub 状态与社交动态。"
+    />
+    <meta name="theme-color" content="#090a0f" />
+    <title>SALIERI_HOME // 个人主页</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <script src="js/config.js" defer></script>
+    <script src="data/site-data.js" defer></script>
+    <script src="js/main.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳到主要内容</a>
+
+    <div class="boot-screen" aria-hidden="true">
+      <div class="boot-screen__mark">SH</div>
+      <div class="boot-screen__bar"><span></span></div>
+      <p>LOADING PROFILE...</p>
+    </div>
+
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="返回页面顶部">
+        <span class="brand__pixel" aria-hidden="true"></span>
+        <span>SALIERI_HOME</span>
+      </a>
+
+      <button
+        class="menu-button pixel-button pixel-button--icon"
+        type="button"
+        aria-label="打开导航"
+        aria-expanded="false"
+        aria-controls="site-nav"
+      >
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav class="site-nav" id="site-nav" aria-label="主要导航">
+        <a href="#profile">01 资料</a>
+        <a href="#gear">02 外设</a>
+        <a href="#crosshair">03 准星</a>
+        <a href="#github">04 GitHub</a>
+        <a href="#activity">05 动态</a>
+      </nav>
+
+      <div class="header-status" aria-label="网站状态">
+        <span class="status-dot"></span>
+        <span>ONLINE</span>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hero" id="top" aria-labelledby="hero-title">
+        <div class="hero__grid" aria-hidden="true"></div>
+        <div class="hero__copy reveal">
+          <p class="eyebrow"><span>PLAYER 01</span> / PROFILE SELECT</p>
+          <h1 id="hero-title">
+            <span class="hero__prompt">HELLO, I AM</span>
+            <span class="hero__name" data-config="profile.nickname">你的昵称</span>
+          </h1>
+          <p class="hero__intro" data-config="profile.bio">
+            这里将放置一句简短的个人介绍，用来说明你正在做什么、喜欢什么。
+          </p>
+          <div class="hero__actions">
+            <a class="pixel-button pixel-button--primary" href="#profile">
+              <span aria-hidden="true">&gt;</span> 查看档案
+            </a>
+            <a class="pixel-button" href="#activity">最近动态</a>
+          </div>
+          <dl class="quick-stats" aria-label="个人概览">
+            <div data-stat="location"><dt data-stat-label>LOCATION</dt><dd data-stat-value>CN</dd></div>
+            <div data-stat="status"><dt data-stat-label>STATUS</dt><dd data-stat-value>ACTIVE</dd></div>
+            <div data-stat="focus"><dt data-stat-label>FOCUS</dt><dd data-stat-value>PLAY / CODE</dd></div>
+          </dl>
+        </div>
+
+        <div class="hero__visual reveal" aria-label="虚拟形象立绘">
+          <div class="pixel-star pixel-star--one" aria-hidden="true"></div>
+          <div class="pixel-star pixel-star--two" aria-hidden="true"></div>
+          <div class="character-shadow" aria-hidden="true"></div>
+          <img
+            class="character-art"
+            src="assets/images/avatar-full.png"
+            alt="黑紫色兜帽虚拟形象全身立绘"
+            width="1024"
+            height="1024"
+          />
+          <div class="character-label" aria-hidden="true">
+            <span>AVATAR_01.PNG</span><span>1024 X 1024</span>
+          </div>
+        </div>
+
+        <a class="scroll-cue" href="#profile" aria-label="向下浏览">
+          <span>SCROLL</span><i aria-hidden="true"></i>
+        </a>
+      </section>
+
+      <div class="system-strip" aria-hidden="true">
+        <div class="system-strip__track">
+          <span>PROFILE</span><i></i><span>GEAR</span><i></i><span>CROSSHAIR</span><i></i><span>GITHUB</span><i></i><span>ACTIVITY</span><i></i>
+          <span>PROFILE</span><i></i><span>GEAR</span><i></i><span>CROSSHAIR</span><i></i><span>GITHUB</span><i></i><span>ACTIVITY</span><i></i>
+        </div>
+      </div>
+
+      <section class="section profile-section" id="profile" aria-labelledby="profile-title">
+        <div class="section-heading reveal">
+          <p class="section-index">01 / PLAYER DATA</p>
+          <h2 id="profile-title">个人信息</h2>
+          <p>PROFILE</p>
+        </div>
+
+        <div class="profile-layout">
+          <div class="profile-card pixel-panel reveal">
+            <div class="avatar-frame">
+              <img src="assets/images/avatar-full.png" alt="个人头像占位" width="240" height="240" />
+              <span class="avatar-frame__status">LV.01</span>
+            </div>
+
+            <div class="profile-card__identity">
+              <span class="data-label">DISPLAY NAME</span>
+              <h3 data-config="profile.nickname">你的昵称</h3>
+              <p data-config="profile.handle">@your_handle</p>
+            </div>
+
+            <dl class="profile-data">
+              <div><dt>学校</dt><dd data-config="profile.school">等待填写</dd></div>
+              <div><dt>生日</dt><dd data-config="profile.birthday">MM / DD</dd></div>
+              <div><dt>所在地</dt><dd data-config="profile.location">等待填写</dd></div>
+              <div><dt>当前状态</dt><dd data-config="profile.status">在线</dd></div>
+            </dl>
+          </div>
+
+          <div class="social-directory reveal">
+            <div class="directory-head">
+              <span>SOCIAL DIRECTORY</span>
+              <span>05 CHANNELS</span>
+            </div>
+            <a class="social-row is-disabled" href="#" data-social-row="bilibili" aria-disabled="true">
+              <span class="social-row__id" data-social-field="id">01</span><span class="social-row__icon" data-social-field="icon">B</span>
+              <span><strong data-social-field="name">哔哩哔哩</strong><small data-social-field="subtitle">BILIBILI</small></span>
+              <span class="social-row__handle" data-social-field="handle">待绑定</span><span class="social-row__arrow">↗</span>
+            </a>
+            <a class="social-row is-disabled" href="#" data-social-row="instagram" aria-disabled="true">
+              <span class="social-row__id" data-social-field="id">02</span><span class="social-row__icon" data-social-field="icon">IG</span>
+              <span><strong data-social-field="name">Instagram</strong><small data-social-field="subtitle">PHOTO STREAM</small></span>
+              <span class="social-row__handle" data-social-field="handle">待绑定</span><span class="social-row__arrow">↗</span>
+            </a>
+            <a class="social-row is-disabled" href="#" data-social-row="weibo" aria-disabled="true">
+              <span class="social-row__id" data-social-field="id">03</span><span class="social-row__icon" data-social-field="icon">W</span>
+              <span><strong data-social-field="name">微博</strong><small data-social-field="subtitle">WEIBO</small></span>
+              <span class="social-row__handle" data-social-field="handle">待绑定</span><span class="social-row__arrow">↗</span>
+            </a>
+            <a class="social-row is-disabled" href="#" data-social-row="netease" aria-disabled="true">
+              <span class="social-row__id" data-social-field="id">04</span><span class="social-row__icon" data-social-field="icon">N</span>
+              <span><strong data-social-field="name">网易云音乐</strong><small data-social-field="subtitle">MUSIC</small></span>
+              <span class="social-row__handle" data-social-field="handle">待绑定</span><span class="social-row__arrow">↗</span>
+            </a>
+            <a class="social-row is-disabled" href="#" data-social-row="github" aria-disabled="true">
+              <span class="social-row__id" data-social-field="id">05</span><span class="social-row__icon" data-social-field="icon">GH</span>
+              <span><strong data-social-field="name">GitHub</strong><small data-social-field="subtitle">CODE REPOSITORY</small></span>
+              <span class="social-row__handle" data-social-field="handle">待绑定</span><span class="social-row__arrow">↗</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section class="section gear-section" id="gear" aria-labelledby="gear-title">
+        <div class="section-heading reveal">
+          <p class="section-index">02 / LOADOUT</p>
+          <h2 id="gear-title">桌面外设</h2>
+          <p>GEAR</p>
+        </div>
+
+        <div class="gear-list">
+          <article class="gear-item reveal" data-gear="mouse">
+            <div class="gear-item__number">01</div>
+            <div class="pixel-device pixel-device--mouse" aria-hidden="true"><i></i></div>
+            <div class="gear-item__type">MOUSE</div>
+            <div><h3 data-gear-field="name">鼠标</h3><p data-gear-field="model">设备型号待填写</p></div>
+            <div class="gear-item__meta"><span data-gear-field="metaLabel">DPI</span><strong data-gear-field="metaValue">----</strong></div>
+          </article>
+          <article class="gear-item reveal" data-gear="keyboard">
+            <div class="gear-item__number">02</div>
+            <div class="pixel-device pixel-device--keyboard" aria-hidden="true"><i></i></div>
+            <div class="gear-item__type">KEYBOARD</div>
+            <div><h3 data-gear-field="name">键盘</h3><p data-gear-field="model">设备型号待填写</p></div>
+            <div class="gear-item__meta"><span data-gear-field="metaLabel">SWITCH</span><strong data-gear-field="metaValue">----</strong></div>
+          </article>
+          <article class="gear-item reveal" data-gear="headset">
+            <div class="gear-item__number">03</div>
+            <div class="pixel-device pixel-device--headset" aria-hidden="true"><i></i></div>
+            <div class="gear-item__type">HEADSET</div>
+            <div><h3 data-gear-field="name">耳机</h3><p data-gear-field="model">设备型号待填写</p></div>
+            <div class="gear-item__meta"><span data-gear-field="metaLabel">MODE</span><strong data-gear-field="metaValue">STEREO</strong></div>
+          </article>
+          <article class="gear-item reveal" data-gear="mousepad">
+            <div class="gear-item__number">04</div>
+            <div class="pixel-device pixel-device--pad" aria-hidden="true"><i></i></div>
+            <div class="gear-item__type">MOUSEPAD</div>
+            <div><h3 data-gear-field="name">鼠标垫</h3><p data-gear-field="model">设备型号待填写</p></div>
+            <div class="gear-item__meta"><span data-gear-field="metaLabel">SIZE</span><strong data-gear-field="metaValue">----</strong></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section crosshair-section" id="crosshair" aria-labelledby="crosshair-title">
+        <div class="section-heading section-heading--light reveal">
+          <p class="section-index">03 / AIM LAB</p>
+          <h2 id="crosshair-title">准星分享</h2>
+          <p>CROSSHAIR</p>
+        </div>
+
+        <div class="crosshair-console reveal">
+          <div class="crosshair-preview" aria-label="准星预览区域">
+            <div class="preview-hud"><span>VALORANT</span><span>LIVE PREVIEW</span></div>
+            <div class="target-grid" aria-hidden="true">
+              <i class="target-grid__v"></i><i class="target-grid__h"></i>
+              <div class="crosshair-shape" data-crosshair-shape="1322">
+                <span class="crosshair-dot"></span>
+                <span class="crosshair-line crosshair-line--top"></span>
+                <span class="crosshair-line crosshair-line--right"></span>
+                <span class="crosshair-line crosshair-line--bottom"></span>
+                <span class="crosshair-line crosshair-line--left"></span>
+              </div>
+            </div>
+            <div class="preview-footer"><span>RANGE_20M</span><span>FPS_144</span></div>
+          </div>
+
+          <div class="crosshair-controls">
+            <div class="crosshair-tabs" role="tablist" aria-label="准星方案">
+              <button class="crosshair-tab is-active" type="button" role="tab" aria-selected="true" data-preset="1322">01 1322</button>
+              <button class="crosshair-tab" type="button" role="tab" aria-selected="false" data-preset="solid">02 实心十字</button>
+              <button class="crosshair-tab" type="button" role="tab" aria-selected="false" data-preset="dot">03 点准星</button>
+            </div>
+            <div class="crosshair-info">
+              <span class="data-label">SELECTED PRESET</span>
+              <h3 id="crosshair-name">1322</h3>
+              <dl>
+                <div><dt>颜色</dt><dd id="crosshair-color">青色</dd></div>
+                <div><dt>轮廓</dt><dd id="crosshair-outline">关闭</dd></div>
+                <div><dt>中心点</dt><dd id="crosshair-center">关闭</dd></div>
+              </dl>
+            </div>
+            <div class="code-box">
+              <span class="data-label">IMPORT CODE</span>
+              <code id="crosshair-code">0;p;0;s;1;P;h;0;f;0;m;1;0l;3;0v;3;0o;2;0a;1;0f;0;1b;0;A;o;0.8;d;1;z;1;m;1;0b;0;1b;0;S;c;0;o;1</code>
+              <button class="pixel-button pixel-button--copy" type="button" data-copy-crosshair>
+                复制代码
+              </button>
+              <span class="copy-status" role="status" aria-live="polite"></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section github-section" id="github" aria-labelledby="github-title">
+        <div class="section-heading reveal">
+          <p class="section-index">04 / DEV LOG</p>
+          <h2 id="github-title">GitHub 状态</h2>
+          <p>GITHUB</p>
+        </div>
+
+        <div class="github-layout">
+          <div class="github-summary reveal">
+            <div class="github-user">
+              <span class="github-mark">GH</span>
+              <div><span class="data-label">ACCOUNT</span><h3 data-config="github.username">等待绑定 GitHub</h3></div>
+            </div>
+            <div class="github-metrics">
+              <div data-github-metric="contributions"><strong>--</strong><span>今年贡献</span></div>
+              <div data-github-metric="streak"><strong>--</strong><span>连续天数</span></div>
+              <div data-github-metric="repositories"><strong>--</strong><span>公开仓库</span></div>
+            </div>
+            <p class="integration-note"><span></span><span data-config="github.integrationNote">DEMO DATA / API NOT CONNECTED</span></p>
+          </div>
+
+          <div class="contribution-panel pixel-panel reveal">
+            <div class="panel-title">
+              <span>CONTRIBUTION MATRIX</span><span>LAST 26 WEEKS</span>
+            </div>
+            <div class="contribution-wrap">
+              <div class="contribution-months" aria-hidden="true" data-github-months></div>
+              <div class="contribution-grid" data-contribution-grid aria-label="GitHub 贡献日期图演示"></div>
+            </div>
+            <div class="contribution-legend"><span>LESS</span><i data-level="0"></i><i data-level="1"></i><i data-level="2"></i><i data-level="3"></i><i data-level="4"></i><span>MORE</span></div>
+          </div>
+
+          <div class="commit-panel pixel-panel reveal">
+            <div class="panel-title"><span>RECENT ACTIVITY</span><span>DEMO</span></div>
+            <ol class="commit-list">
+              <li data-commit="0"><span class="commit-node"></span><div><strong>等待接入真实提交记录</strong><small>GitHub Events API</small></div><time>--</time></li>
+              <li data-commit="1"><span class="commit-node"></span><div><strong>仓库与提交信息将在这里显示</strong><small>repository / commit</small></div><time>--</time></li>
+              <li data-commit="2"><span class="commit-node"></span><div><strong>支持展示 Push、Star 与 Release</strong><small>public activity</small></div><time>--</time></li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <section class="section activity-section" id="activity" aria-labelledby="activity-title">
+        <div class="section-heading reveal">
+          <p class="section-index">05 / SIGNAL FEED</p>
+          <h2 id="activity-title">最近动态</h2>
+          <p>ACTIVITY</p>
+        </div>
+
+        <div class="feed-toolbar reveal">
+          <div class="feed-filters" role="group" aria-label="动态来源筛选">
+            <button class="feed-filter is-active" type="button" data-filter="all">全部</button>
+            <button class="feed-filter" type="button" data-filter="bilibili">B站</button>
+            <button class="feed-filter" type="button" data-filter="weibo">微博</button>
+            <button class="feed-filter" type="button" data-filter="netease">网易云</button>
+            <button class="feed-filter" type="button" data-filter="instagram">INS</button>
+          </div>
+          <div class="sync-state"><span></span>SYNC READY</div>
+        </div>
+
+        <div class="activity-feed" aria-live="polite">
+          <article class="feed-item reveal" data-activity-source="bilibili">
+            <div class="feed-item__platform feed-item__platform--bilibili">B</div>
+            <div class="feed-item__body"><div class="feed-item__meta"><strong data-activity-field="platform">哔哩哔哩</strong><time data-activity-field="time">等待同步</time></div><h3 data-activity-field="title">最新视频动态将在这里显示</h3><p data-activity-field="summary">标题、发布时间、封面和链接接入后自动更新。</p></div>
+            <span class="feed-item__type" data-activity-field="type">VIDEO</span>
+          </article>
+          <article class="feed-item reveal" data-activity-source="weibo">
+            <div class="feed-item__platform feed-item__platform--weibo">W</div>
+            <div class="feed-item__body"><div class="feed-item__meta"><strong data-activity-field="platform">微博</strong><time data-activity-field="time">等待同步</time></div><h3 data-activity-field="title">最新微博将在这里显示</h3><p data-activity-field="summary">文字、图片与原始动态链接会汇总到这一条时间线。</p></div>
+            <span class="feed-item__type" data-activity-field="type">POST</span>
+          </article>
+          <article class="feed-item reveal" data-activity-source="netease">
+            <div class="feed-item__platform feed-item__platform--netease">N</div>
+            <div class="feed-item__body"><div class="feed-item__meta"><strong data-activity-field="platform">网易云音乐</strong><time data-activity-field="time">等待同步</time></div><h3 data-activity-field="title">最近在听将在这里显示</h3><p data-activity-field="summary">可展示歌名、艺人、封面与歌单链接。</p></div>
+            <span class="feed-item__type" data-activity-field="type">MUSIC</span>
+          </article>
+          <article class="feed-item reveal" data-activity-source="instagram">
+            <div class="feed-item__platform feed-item__platform--instagram">IG</div>
+            <div class="feed-item__body"><div class="feed-item__meta"><strong data-activity-field="platform">Instagram</strong><time data-activity-field="time">等待同步</time></div><h3 data-activity-field="title">最新图片动态将在这里显示</h3><p data-activity-field="summary">接入公开数据后，这里会展示缩略图与动态摘要。</p></div>
+            <span class="feed-item__type" data-activity-field="type">PHOTO</span>
+          </article>
+          <div class="feed-empty" hidden>该频道暂时没有动态。</div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-brand"><span class="brand__pixel"></span><strong>SALIERI_HOME</strong></div>
+      <p>BUILT WITH HTML / CSS / JS</p>
+      <a href="#top">BACK TO TOP ↑</a>
+      <p class="footer-copy">© <span data-current-year></span> YOUR NAME</p>
+    </footer>
+  </body>
+</html>
