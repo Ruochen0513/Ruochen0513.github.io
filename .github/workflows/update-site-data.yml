@@ -35,7 +35,7 @@ jobs:
 
       - name: Fetch GitHub data
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PROFILE_GITHUB_TOKEN || github.token }}
         run: >-
           node automation/update-site-data.mjs
           --config automation/github-pages-config.json

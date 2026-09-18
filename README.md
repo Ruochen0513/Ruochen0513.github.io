@@ -37,3 +37,5 @@ systemd 用户定时器（每日 03:00）
 完整配置和安装步骤见 [`automation/API-CONFIG.md`](./automation/API-CONFIG.md)。密钥保存在本地 `automation/.env`，不会发送到浏览器。
 
 部署到 GitHub Pages 后，[`.github/workflows/update-site-data.yml`](./.github/workflows/update-site-data.yml) 会在每天北京时间 03:00 使用 GitHub 提供的临时 Token 更新并提交 `data/site-data.js`，随后直接部署页面。GitHub Pages 的 Source 需要设为 `GitHub Actions`；也可以在仓库的 `Actions` 页面手动运行 `Update site data`。
+
+默认的 Actions Token 只能统计公开贡献。若要让线上统计与可访问私有仓库的本地 PAT 保持一致，请在仓库 Actions Secrets 中配置 `PROFILE_GITHUB_TOKEN`。公开页面会展示贡献数量和日期分布，但不会包含 Token 或私有仓库名称。
