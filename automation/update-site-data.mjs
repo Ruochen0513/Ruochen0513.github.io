@@ -163,7 +163,7 @@ async function updateGithub(source, env, statuses) {
         token,
         method: "POST",
         body: {
-          query: `query($login:String!,$from:DateTime!,$to:DateTime!){user(login:$login){contributionsCollection(from:$from,to:$to){totalCommitContributions contributionCalendar{weeks{contributionDays{contributionCount date}}}}}}`,
+          query: `query($login:String!,$from:DateTime!,$to:DateTime!){user(login:$login){contributionsCollection(from:$from,to:$to){contributionCalendar{totalContributions weeks{contributionDays{contributionCount date}}}}}}`,
           variables: { login: source.username, from: from.toISOString(), to: to.toISOString() },
         },
       });
@@ -171,8 +171,9 @@ async function updateGithub(source, env, statuses) {
       const grid = collection?.contributionCalendar?.weeks?.flatMap((week) => week.contributionDays.map((day) => day.contributionCount)).slice(-182) || [];
       if (grid.length) {
         base.contributionGrid = grid;
-        base.metrics.contributions.value = text(collection.totalCommitContributions, "--");
+        base.metrics.contributions.value = text(collection.contributionCalendar.totalContributions, "--");
         base.metrics.streak.value = String(currentStreak(grid));
+        statuses.github.message = "REST profile, events, and GraphQL contributions updated";
       }
     }
     base.integrationNote = `UPDATED ${new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai", hour12: false })}`;

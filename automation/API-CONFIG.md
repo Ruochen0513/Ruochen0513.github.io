@@ -138,3 +138,9 @@ journalctl --user -u player-home-update.service -n 50 --no-pager
 ## 6. 主页刷新
 
 静态页面不会被后台主动推送。定时任务更新数据后，重新打开或刷新主页即可看到最新状态。当前本地服务器地址为 `http://localhost:4173`。
+
+## 7. GitHub Pages 自动更新
+
+仓库中的 `.github/workflows/update-site-data.yml` 会在每天北京时间 03:00 运行，使用 GitHub Actions 自动提供的临时 `GITHUB_TOKEN` 拉取 GitHub 状态，把新的 `data/site-data.js` 提交回 `main` 分支，并直接部署站点。这个流程不依赖本机开机，也不需要把个人 Token 上传到仓库。
+
+首次推送工作流后，在仓库 `Settings -> Pages -> Build and deployment -> Source` 中选择 `GitHub Actions`。然后进入 `Actions` 页面，选择 `Update site data`，点击 `Run workflow` 立即验证。若工作流无法推送，请在 `Settings -> Actions -> General -> Workflow permissions` 中选择 `Read and write permissions`。

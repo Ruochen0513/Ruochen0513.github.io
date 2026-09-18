@@ -144,7 +144,7 @@ if (contributionGrid) {
     const cell = document.createElement("i");
     const level = liveGrid[index] ?? activityPattern[(index * 7 + Math.floor(index / 11)) % activityPattern.length];
     cell.dataset.level = String(level);
-    cell.title = `演示贡献等级 ${level}`;
+    cell.title = liveGrid.length ? `贡献数 ${level}` : `演示贡献等级 ${level}`;
     contributionGrid.appendChild(cell);
   }
 }

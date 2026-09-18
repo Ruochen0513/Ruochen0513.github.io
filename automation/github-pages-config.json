@@ -1,0 +1,10 @@
+{
+  "timezone": "Asia/Shanghai",
+  "github": {
+    "enabled": true,
+    "username": "Ruochen0513",
+    "tokenEnv": "GITHUB_TOKEN",
+    "eventsLimit": 8
+  },
+  "social": {}
+}
