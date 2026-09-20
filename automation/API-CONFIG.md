@@ -94,9 +94,55 @@ Secret: 上述完整 Cookie 值
 }
 ```
 
-## 5. 其他社交平台配置
+## 5. 网易云本周常听
 
-网易云和 Instagram 采用通用 JSON 接口适配器。每个平台需要一个能够返回 JSON 的接口地址，返回格式默认如下：
+网易云周排行已经内置支持。当前 UID 为 `320515567`，页面会展示本周排行前三首的歌曲名、艺人、专辑、封面和歌曲链接：
+
+```json
+"netease": {
+  "enabled": true,
+  "provider": "netease",
+  "uid": "320515567",
+  "platform": "网易云音乐",
+  "defaultType": "WEEKLY TOP",
+  "recordType": 1,
+  "limit": 3,
+  "cookieEnv": "MUSIC_COOKIE"
+}
+```
+
+- `uid`：个人主页 URL `music.163.com/#/user/home?id=数字` 中的数字。
+- `recordType: 1`：最近一周排行；改为 `0` 表示所有时间排行。
+- `limit`：页面展示的歌曲数量。
+- 这是按周统计的排行，不是包含精确播放时刻的历史流水。
+- 接口有播放次数时显示次数；接口隐藏次数时显示其归一化排行热度。
+
+更新器默认直接请求网易云的 Web 接口。账号必须公开听歌排行，否则会返回空数据。当前公开数据无需 Cookie；如果以后遇到登录限制或风控，可在本地 `automation/.env` 中填写：
+
+```dotenv
+MUSIC_COOKIE=MUSIC_U=...; __csrf=...; ...
+```
+
+线上则在仓库 `Settings -> Secrets and variables -> Actions -> New repository secret` 新建：
+
+```text
+Name: MUSIC_COOKIE
+Secret: 登录 music.163.com 后，请求头中完整的 Cookie 值
+```
+
+Cookie 只会传给后台更新脚本，不会写入 `data/site-data.js`、网页或 Git 历史。抓取失败时，页面会继续使用上一次成功的数据。
+
+如果直接接口失效，也可以自建 NeteaseCloudMusicApi，并在网易云配置中增加：
+
+```json
+"apiBase": "https://your-netease-api.example.com/"
+```
+
+更新器会改为请求 `https://your-netease-api.example.com/user/record?uid=...&type=1`。
+
+## 6. Instagram 通用接口配置
+
+Instagram 仍采用通用 JSON 接口适配器。接口返回格式默认如下：
 
 ```json
 {
@@ -114,12 +160,12 @@ Secret: 上述完整 Cookie 值
 在 `api-config.json` 中开启对应来源并填写字段映射：
 
 ```json
-"netease": {
+"instagram": {
   "enabled": true,
-  "url": "https://your-api.example/netease",
-  "tokenEnv": "NETEASE_TOKEN",
+  "url": "https://your-api.example/instagram",
+  "tokenEnv": "INSTAGRAM_TOKEN",
   "itemsPath": "items",
-  "defaultType": "MUSIC",
+  "defaultType": "PHOTO",
   "fieldMap": {
     "title": "title",
     "summary": "description",
@@ -138,9 +184,9 @@ Secret: 上述完整 Cookie 值
 - `defaultType`: 动态类型，例如 `VIDEO`、`POST`、`MUSIC`、`PHOTO`。
 - `fieldMap`: 把接口字段映射到主页字段；字段支持点号路径。
 
-网易云和 Instagram 是否能直接使用官方接口，取决于账号权限和平台开放能力。需要 OAuth 的平台应使用官方 Token，并放入 `.env`。
+需要 OAuth 的接口 Token 应只放入 `.env` 或 GitHub Actions Secret。
 
-## 6. 手动测试
+## 7. 手动测试
 
 配置好后，在项目根目录运行：
 
@@ -162,7 +208,7 @@ data/site-data.js
 
 每个来源的成功、跳过或失败原因会写入生成文件中的 `sourceStatus`，一个平台失败不会阻塞其他平台。
 
-## 7. 每日 03:00 定时任务
+## 8. 每日 03:00 定时任务
 
 当前机器已经安装并启用了 `player-home-update.timer`，每天 `03:00:00` 运行。修改 API 配置后不需要重新安装定时器。需要在其他电脑部署时，执行一次：
 
@@ -189,11 +235,11 @@ journalctl --user -u player-home-update.service -n 50 --no-pager
 ./automation/uninstall-schedule.sh
 ```
 
-## 8. 主页刷新
+## 9. 主页刷新
 
 静态页面不会被后台主动推送。定时任务更新数据后，重新打开或刷新主页即可看到最新状态。当前本地服务器地址为 `http://localhost:4173`。
 
-## 9. GitHub Pages 自动更新
+## 10. GitHub Pages 自动更新
 
 仓库中的 `.github/workflows/update-site-data.yml` 会在每天北京时间 03:00 运行，拉取 GitHub 状态，在 Actions 环境中生成新的 `data/site-data.js` 并直接部署站点。它不会向 `main` 分支提交生成文件，因此不会造成日常本地推送冲突。这个流程不依赖本机开机。
 

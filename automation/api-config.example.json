@@ -25,13 +25,14 @@
       "cookieEnv": "WEIBO_COOKIE"
     },
     "netease": {
-      "enabled": false,
+      "enabled": true,
+      "provider": "netease",
+      "uid": "YOUR_NETEASE_UID",
       "platform": "网易云音乐",
-      "url": "https://your-json-endpoint.example/netease",
-      "tokenEnv": "NETEASE_TOKEN",
-      "itemsPath": "items",
-      "defaultType": "MUSIC",
-      "fieldMap": { "title": "name", "summary": "artist", "time": "created_at", "url": "url" }
+      "defaultType": "WEEKLY TOP",
+      "recordType": 1,
+      "limit": 3,
+      "cookieEnv": "MUSIC_COOKIE"
     },
     "instagram": {
       "enabled": false,

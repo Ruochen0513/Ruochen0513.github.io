@@ -95,6 +95,31 @@ document.querySelectorAll("[data-activity-source]").forEach((row) => {
     cover.hidden = false;
     cover.referrerPolicy = "no-referrer";
   }
+  const ranking = row.querySelector("[data-music-ranking]");
+  if (ranking && Array.isArray(item.ranking) && item.ranking.length) {
+    ranking.replaceChildren();
+    item.ranking.forEach((song) => {
+      const entry = document.createElement("li");
+      const rank = document.createElement("span");
+      const link = document.createElement("a");
+      const name = document.createElement("strong");
+      const details = document.createElement("small");
+      const metric = document.createElement("span");
+      rank.className = "music-ranking__rank";
+      metric.className = "music-ranking__metric";
+      rank.textContent = String(song.rank).padStart(2, "0");
+      name.textContent = song.name;
+      details.textContent = [song.artists?.join(" / "), song.album].filter(Boolean).join(" · ");
+      metric.textContent = song.playCount > 0 ? `${song.playCount} 次` : `热度 ${song.score}`;
+      link.href = song.url;
+      link.target = "_blank";
+      link.rel = "noreferrer";
+      link.append(name, details);
+      entry.append(rank, link, metric);
+      ranking.appendChild(entry);
+    });
+    ranking.hidden = false;
+  }
 });
 
 const crosshairPresets = Object.fromEntries(config.crosshairs.map((preset) => [preset.key, preset]));

@@ -359,6 +359,7 @@ img { display: block; max-width: 100%; }
 .feed-item__media img:not([hidden]) + .feed-item__platform { position: absolute; right: 4px; bottom: 4px; width: 25px; height: 25px; border-width: 1px; background: rgba(9,10,15,.9); font-size: 8px; }
 .feed-item__platform--bilibili { color: #73c8e6; }.feed-item__platform--weibo { color: #e5a359; }.feed-item__platform--netease { color: var(--red); }.feed-item__platform--instagram { color: #c8a0d8; }
 .feed-item__meta { display: flex; align-items: center; gap: 12px; }
+.feed-item__body { min-width: 0; }
 .feed-item__meta strong { font-size: 10px; }.feed-item__meta time { color: var(--dim); font-size: 8px; }
 .feed-item h3 { margin: 5px 0 2px; font-size: 15px; }
 .feed-item h3 a:hover { color: var(--cyan); }
@@ -367,6 +368,14 @@ img { display: block; max-width: 100%; }
 .feed-item__link { display: flex; align-items: center; gap: 8px; padding: 10px 0; }
 .feed-item__link:not([href]) { pointer-events: none; }
 .feed-item__link[href]:hover { color: var(--cyan); }
+.music-ranking { display: grid; gap: 2px; margin: 9px 0 2px; padding: 0; list-style: none; }
+.music-ranking li { display: grid; min-width: 0; grid-template-columns: 24px minmax(0,1fr) auto; align-items: center; gap: 8px; padding-top: 4px; border-top: 1px dashed var(--line); }
+.music-ranking a { min-width: 0; }
+.music-ranking strong, .music-ranking small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.music-ranking strong { color: var(--text); font-size: 9px; }
+.music-ranking small, .music-ranking__rank, .music-ranking__metric { color: var(--dim); font-size: 7px; }
+.music-ranking a:hover strong { color: var(--cyan); }
+.music-ranking__metric { white-space: nowrap; }
 .feed-empty { padding: 80px 20px; color: var(--dim); text-align: center; }
 
 .site-footer { display: grid; width: var(--page); min-height: 160px; margin: 0 auto; grid-template-columns: 1fr auto auto; align-items: center; gap: 28px; border-top: 3px solid var(--line); color: var(--dim); font-size: 9px; }

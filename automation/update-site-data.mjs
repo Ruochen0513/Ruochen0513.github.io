@@ -13,6 +13,7 @@ const DEFAULT_OUTPUT = resolve(PROJECT_DIR, "data/site-data.js");
 const USER_AGENT = "PLAYER_HOME local data updater";
 const BILIBILI_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/131.0.0.0 Safari/537.36";
 const WEIBO_USER_AGENT = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Version/17.0 Mobile/15E148 Safari/604.1";
+const NETEASE_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/145.0.0.0 Safari/537.36";
 const WBI_MIXIN_KEY_TABLE = [46, 47, 18, 2, 53, 8, 23, 32, 15, 50, 10, 31, 58, 3, 45, 35, 27, 43, 5, 49, 33, 9, 42, 19, 29, 28, 14, 39, 12, 38, 41, 13, 37, 48, 7, 16, 24, 55, 40, 61, 26, 17, 0, 1, 60, 51, 30, 4, 22, 25, 54, 21, 56, 59, 6, 63, 57, 62, 11, 36, 20, 34, 44, 52];
 
 const args = new Map();
@@ -354,6 +355,94 @@ async function updateBilibili(source, statuses) {
   }
 }
 
+function normalizeNeteaseRanking(records, limit = 3) {
+  return (Array.isArray(records) ? records : [])
+    .map((record, index) => {
+      const song = record?.song || {};
+      const artists = (song.ar || song.artists || []).map((artist) => text(artist?.name)).filter(Boolean);
+      const album = song.al || song.album || {};
+      const id = Number(song.id);
+      return {
+        rank: index + 1,
+        id,
+        name: text(song.name),
+        artists,
+        album: text(album.name),
+        cover: text(album.picUrl).replace(/^http:/, "https:"),
+        playCount: Number(record?.playCount) || 0,
+        score: Number(record?.score) || 0,
+        url: Number.isFinite(id) ? `https://music.163.com/song?id=${id}` : "",
+      };
+    })
+    .filter((item) => Number.isFinite(item.id) && item.name)
+    .slice(0, Math.max(1, Number(limit) || 3));
+}
+
+function neteaseMetric(item) {
+  return item.playCount > 0 ? `${compactCount(item.playCount)} 次播放` : `热度 ${item.score}`;
+}
+
+function buildNeteaseActivity(source, records) {
+  const ranking = normalizeNeteaseRanking(records, source.limit);
+  if (!ranking.length) throw new Error("NetEase returned no public weekly listening data");
+  const top = ranking[0];
+  const artist = top.artists.join(" / ") || "未知艺人";
+  return {
+    source: "netease",
+    platform: text(source.platform, "网易云音乐"),
+    time: "本周排行",
+    title: `本周常听 Top ${ranking.length}`,
+    summary: `当前首位：${top.name} · ${artist} · ${neteaseMetric(top)}`,
+    type: text(source.defaultType, "WEEKLY TOP"),
+    url: top.url,
+    cover: top.cover,
+    ranking,
+  };
+}
+
+function neteaseRecordUrl(source) {
+  if (source.apiBase) {
+    const base = source.apiBase.endsWith("/") ? source.apiBase : `${source.apiBase}/`;
+    return new URL("user/record", base);
+  }
+  return new URL(source.url || "https://music.163.com/api/v1/play/record");
+}
+
+async function updateNetease(source, env, statuses) {
+  if (!source?.enabled || !source.uid) {
+    statuses.netease = emptyStatus();
+    return null;
+  }
+
+  try {
+    const url = neteaseRecordUrl(source);
+    url.searchParams.set("uid", source.uid);
+    url.searchParams.set("type", String(source.recordType ?? 1));
+    const cookie = secretFor(source, "cookieEnv", env);
+    const payload = await fetchJson(url, {
+      headers: {
+        "User-Agent": NETEASE_USER_AGENT,
+        Referer: `https://music.163.com/user/home?id=${encodeURIComponent(source.uid)}`,
+        ...(cookie ? { Cookie: cookie } : {}),
+      },
+    });
+    if (Number(payload?.code) !== 200) {
+      throw new Error(`NetEase API ${text(payload?.code, "unknown")}: ${text(payload?.message || payload?.msg, "request failed")}`);
+    }
+    const records = payload.weekData || payload.data?.weekData;
+    const activity = buildNeteaseActivity(source, records);
+    statuses.netease = {
+      status: "ok",
+      updatedAt: new Date().toISOString(),
+      message: `weekly ranking updated (${activity.ranking.length} songs)`,
+    };
+    return activity;
+  } catch (error) {
+    statuses.netease = { status: "error", updatedAt: new Date().toISOString(), message: error.message };
+    return null;
+  }
+}
+
 function emptyStatus() {
   return { status: "skipped", updatedAt: null, message: "not configured" };
 }
@@ -508,6 +597,8 @@ async function main() {
       item = await updateBilibili(source, statuses);
     } else if (key === "weibo" && source.provider === "weibo") {
       item = await updateWeibo(source, env, statuses);
+    } else if (key === "netease" && source.provider === "netease") {
+      item = await updateNetease(source, env, statuses);
     } else {
       item = await updateSocialSource(key, source, env, statuses);
     }
@@ -541,4 +632,10 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   });
 }
 
-export { buildWeiboActivity, htmlToPlainText, selectLatestWeiboPost };
+export {
+  buildNeteaseActivity,
+  buildWeiboActivity,
+  htmlToPlainText,
+  normalizeNeteaseRanking,
+  selectLatestWeiboPost,
+};
