@@ -8,13 +8,11 @@
   },
   "social": {
     "bilibili": {
-      "enabled": false,
+      "enabled": true,
+      "provider": "bilibili",
+      "uid": "YOUR_BILIBILI_UID",
       "platform": "哔哩哔哩",
-      "url": "https://your-json-endpoint.example/bilibili",
-      "tokenEnv": "BILIBILI_TOKEN",
-      "itemsPath": "items",
-      "defaultType": "VIDEO",
-      "fieldMap": { "title": "title", "summary": "description", "time": "published_at", "url": "url" }
+      "defaultType": "VIDEO"
     },
     "weibo": {
       "enabled": false,

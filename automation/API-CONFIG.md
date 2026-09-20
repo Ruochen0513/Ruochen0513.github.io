@@ -40,9 +40,27 @@ Token 建议只授予读取公开仓库和用户数据的权限。脚本会自�
 
 没有 `GITHUB_TOKEN` 时，用户资料和公开事件仍可能正常更新，但贡献日期图会保留页面中的演示数据。
 
-## 3. 社交平台配置
+## 3. B站最新投稿
 
-四个平台采用通用 JSON 接口适配器。每个平台需要一个能够返回 JSON 的接口地址，返回格式默认如下：
+B站最新投稿已经内置支持，不需要 Token 或 Cookie。在 `api-config.json` 中配置：
+
+```json
+"bilibili": {
+  "enabled": true,
+  "provider": "bilibili",
+  "uid": "56829848",
+  "platform": "哔哩哔哩",
+  "defaultType": "VIDEO"
+}
+```
+
+`uid` 是个人空间 URL `space.bilibili.com/数字` 中的数字。更新器会在后台生成 WBI 签名并读取最新一条公开投稿，返回标题、BV 号、封面、简介、播放量、发布时间和视频链接。请求只在本机定时任务或 GitHub Actions 中发生，浏览器不会直接访问 API，也不会暴露凭证。
+
+GitHub Pages 的线上配置位于 `automation/github-pages-config.json`。当前 UID 已设为 `56829848`，每天北京时间 03:00 随 GitHub 状态一起更新。B站可能调整或限制非官方 Web API；如果 `sourceStatus.bilibili` 出现风控错误，可改为自建 RSSHub 的通用 JSON 接口模式。
+
+## 4. 其他社交平台配置
+
+微博、网易云和 Instagram 采用通用 JSON 接口适配器。每个平台需要一个能够返回 JSON 的接口地址，返回格式默认如下：
 
 ```json
 {
@@ -60,12 +78,12 @@ Token 建议只授予读取公开仓库和用户数据的权限。脚本会自�
 在 `api-config.json` 中开启对应来源并填写字段映射：
 
 ```json
-"bilibili": {
+"weibo": {
   "enabled": true,
-  "url": "https://your-api.example/bilibili",
-  "tokenEnv": "BILIBILI_TOKEN",
+  "url": "https://your-api.example/weibo",
+  "tokenEnv": "WEIBO_TOKEN",
   "itemsPath": "items",
-  "defaultType": "VIDEO",
+  "defaultType": "POST",
   "fieldMap": {
     "title": "title",
     "summary": "description",
@@ -84,9 +102,9 @@ Token 建议只授予读取公开仓库和用户数据的权限。脚本会自�
 - `defaultType`: 动态类型，例如 `VIDEO`、`POST`、`MUSIC`、`PHOTO`。
 - `fieldMap`: 把接口字段映射到主页字段；字段支持点号路径。
 
-B站、微博、网易云和 Instagram 是否能直接使用官方接口，取决于账号权限和平台开放能力。不要把网页登录 Cookie 写入配置；需要 OAuth 的平台应使用官方 Token，并放入 `.env`。
+微博、网易云和 Instagram 是否能直接使用官方接口，取决于账号权限和平台开放能力。不要把网页登录 Cookie 写入配置；需要 OAuth 的平台应使用官方 Token，并放入 `.env`。
 
-## 4. 手动测试
+## 5. 手动测试
 
 配置好后，在项目根目录运行：
 
@@ -108,7 +126,7 @@ data/site-data.js
 
 每个来源的成功、跳过或失败原因会写入生成文件中的 `sourceStatus`，一个平台失败不会阻塞其他平台。
 
-## 5. 每日 03:00 定时任务
+## 6. 每日 03:00 定时任务
 
 当前机器已经安装并启用了 `player-home-update.timer`，每天 `03:00:00` 运行。修改 API 配置后不需要重新安装定时器。需要在其他电脑部署时，执行一次：
 
@@ -135,11 +153,11 @@ journalctl --user -u player-home-update.service -n 50 --no-pager
 ./automation/uninstall-schedule.sh
 ```
 
-## 6. 主页刷新
+## 7. 主页刷新
 
 静态页面不会被后台主动推送。定时任务更新数据后，重新打开或刷新主页即可看到最新状态。当前本地服务器地址为 `http://localhost:4173`。
 
-## 7. GitHub Pages 自动更新
+## 8. GitHub Pages 自动更新
 
 仓库中的 `.github/workflows/update-site-data.yml` 会在每天北京时间 03:00 运行，拉取 GitHub 状态，在 Actions 环境中生成新的 `data/site-data.js` 并直接部署站点。它不会向 `main` 分支提交生成文件，因此不会造成日常本地推送冲突。这个流程不依赖本机开机。
 

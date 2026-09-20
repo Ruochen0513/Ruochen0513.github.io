@@ -350,16 +350,23 @@ img { display: block; max-width: 100%; }
 .feed-filter:hover, .feed-filter.is-active { border-color: var(--purple-bright); background: var(--purple); color: #fff; }
 .sync-state { display: flex; align-items: center; gap: 8px; color: var(--green); font-size: 9px; }
 .activity-feed { min-height: 320px; }
-.feed-item { display: grid; min-height: 122px; grid-template-columns: 56px minmax(0,1fr) 60px; align-items: center; gap: 25px; border-bottom: 1px solid var(--line); transition: padding .16s steps(2), background .16s steps(2), opacity .18s; }
+.feed-item { display: grid; min-height: 122px; grid-template-columns: 96px minmax(0,1fr) 68px; align-items: center; gap: 25px; border-bottom: 1px solid var(--line); transition: padding .16s steps(2), background .16s steps(2), opacity .18s; }
 .feed-item:hover { padding-inline: 12px; background: var(--panel); }
 .feed-item[hidden] { display: none; }
 .feed-item__platform { display: grid; width: 48px; height: 48px; place-items: center; border: 2px solid currentColor; font-size: 12px; font-weight: 900; }
+.feed-item__media { position: relative; display: grid; width: 96px; height: 58px; place-items: center; overflow: hidden; background: #111219; }
+.feed-item__media img { width: 100%; height: 100%; object-fit: cover; }
+.feed-item__media img:not([hidden]) + .feed-item__platform { position: absolute; right: 4px; bottom: 4px; width: 25px; height: 25px; border-width: 1px; background: rgba(9,10,15,.9); font-size: 8px; }
 .feed-item__platform--bilibili { color: #73c8e6; }.feed-item__platform--weibo { color: #e5a359; }.feed-item__platform--netease { color: var(--red); }.feed-item__platform--instagram { color: #c8a0d8; }
 .feed-item__meta { display: flex; align-items: center; gap: 12px; }
 .feed-item__meta strong { font-size: 10px; }.feed-item__meta time { color: var(--dim); font-size: 8px; }
 .feed-item h3 { margin: 5px 0 2px; font-size: 15px; }
+.feed-item h3 a:hover { color: var(--cyan); }
 .feed-item p { margin: 0; color: var(--muted); font-size: 10px; }
-.feed-item__type { justify-self: end; color: var(--dim); font-size: 9px; }
+.feed-item__type, .feed-item__link { justify-self: end; color: var(--dim); font-size: 9px; }
+.feed-item__link { display: flex; align-items: center; gap: 8px; padding: 10px 0; }
+.feed-item__link:not([href]) { pointer-events: none; }
+.feed-item__link[href]:hover { color: var(--cyan); }
 .feed-empty { padding: 80px 20px; color: var(--dim); text-align: center; }
 
 .site-footer { display: grid; width: var(--page); min-height: 160px; margin: 0 auto; grid-template-columns: 1fr auto auto; align-items: center; gap: 28px; border-top: 3px solid var(--line); color: var(--dim); font-size: 9px; }
@@ -441,9 +448,10 @@ img { display: block; max-width: 100%; }
   }
   .github-metrics strong { font-size: 23px; }
   .feed-toolbar { align-items: flex-start; flex-direction: column; }
-  .feed-item { min-height: 135px; grid-template-columns: 42px minmax(0,1fr); gap: 15px; }
+  .feed-item { min-height: 135px; grid-template-columns: 72px minmax(0,1fr); gap: 15px; }
+  .feed-item__media { width: 72px; height: 48px; }
   .feed-item__platform { width: 40px; height: 40px; }
-  .feed-item__type { display: none; }
+  .feed-item__type, .feed-item__link { display: none; }
   .site-footer { padding: 42px 0; grid-template-columns: 1fr auto; }
   .site-footer > p:not(.footer-copy) { display: none; }
   .footer-copy { grid-column: 1 / -1; margin: 0; }

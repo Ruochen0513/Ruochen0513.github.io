@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { readFile, rename, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -10,6 +11,8 @@ const DEFAULT_CONFIG = resolve(SCRIPT_DIR, "api-config.json");
 const DEFAULT_ENV = resolve(SCRIPT_DIR, ".env");
 const DEFAULT_OUTPUT = resolve(PROJECT_DIR, "data/site-data.js");
 const USER_AGENT = "PLAYER_HOME local data updater";
+const BILIBILI_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/131.0.0.0 Safari/537.36";
+const WBI_MIXIN_KEY_TABLE = [46, 47, 18, 2, 53, 8, 23, 32, 15, 50, 10, 31, 58, 3, 45, 35, 27, 43, 5, 49, 33, 9, 42, 19, 29, 28, 14, 39, 12, 38, 41, 13, 37, 48, 7, 16, 24, 55, 40, 61, 26, 17, 0, 1, 60, 51, 30, 4, 22, 25, 54, 21, 56, 59, 6, 63, 57, 62, 11, 36, 20, 34, 44, 52];
 
 const args = new Map();
 for (let index = 2; index < process.argv.length; index += 1) {
@@ -47,6 +50,17 @@ async function readJson(path) {
   return JSON.parse(await readFile(path, "utf8"));
 }
 
+async function readGeneratedData(path) {
+  const source = await readOptional(path);
+  const match = source.match(/^window\.PLAYER_HOME_LIVE_DATA\s*=\s*([\s\S]+);\s*$/m);
+  if (!match) return {};
+  try {
+    return JSON.parse(match[1]);
+  } catch {
+    return {};
+  }
+}
+
 function getPath(source, path) {
   if (!path) return source;
   return path.split(".").reduce((value, key) => value?.[key], source);
@@ -67,7 +81,7 @@ function tokenFor(source, env) {
   return source?.tokenEnv ? env[source.tokenEnv] || process.env[source.tokenEnv] || "" : "";
 }
 
-async function fetchJson(url, { token = "", method = "GET", body } = {}) {
+async function fetchJson(url, { token = "", method = "GET", body, headers = {} } = {}) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 25_000);
   try {
@@ -79,6 +93,7 @@ async function fetchJson(url, { token = "", method = "GET", body } = {}) {
         "User-Agent": USER_AGENT,
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...(body ? { "Content-Type": "application/json" } : {}),
+        ...headers,
       },
       ...(body ? { body: JSON.stringify(body) } : {}),
     });
@@ -95,6 +110,129 @@ async function fetchJson(url, { token = "", method = "GET", body } = {}) {
     return data;
   } finally {
     clearTimeout(timer);
+  }
+}
+
+function bilibiliWbiKey(url) {
+  return url.split("/").at(-1)?.split(".")[0] || "";
+}
+
+function signBilibiliParams(params, imgUrl, subUrl) {
+  const sourceKey = `${bilibiliWbiKey(imgUrl)}${bilibiliWbiKey(subUrl)}`;
+  const mixinKey = WBI_MIXIN_KEY_TABLE.map((index) => sourceKey[index] || "").join("").slice(0, 32);
+  const signed = { ...params, wts: Math.floor(Date.now() / 1000) };
+  const query = Object.keys(signed)
+    .sort()
+    .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(String(signed[key]).replace(/[!'()*]/g, ""))}`)
+    .join("&");
+  const digest = createHash("md5").update(`${query}${mixinKey}`).digest("hex");
+  return `${query}&w_rid=${digest}`;
+}
+
+function compactCount(value) {
+  const count = Number(value);
+  if (!Number.isFinite(count)) return "--";
+  if (count >= 10000) return `${(count / 10000).toFixed(count >= 100000 ? 0 : 1)}万`;
+  return new Intl.NumberFormat("zh-CN").format(count);
+}
+
+function compactText(value, maxLength = 96) {
+  const normalized = text(value).replace(/\s+/g, " ");
+  return normalized.length > maxLength ? `${normalized.slice(0, maxLength - 1)}…` : normalized;
+}
+
+function buildBilibiliActivity(source, video) {
+  const description = compactText(video.description) || "暂无视频简介";
+  const playCount = compactCount(video.play);
+  return {
+    source: "bilibili",
+    platform: text(source.platform, "哔哩哔哩"),
+    time: isoDate(video.publishedAt),
+    title: text(video.title, "最新投稿"),
+    summary: `${description} · ${playCount} 播放`,
+    type: text(source.defaultType, "VIDEO"),
+    url: `https://www.bilibili.com/video/${video.bvid}`,
+    cover: text(video.cover).replace(/^http:/, "https:"),
+    bvid: video.bvid,
+    playCount: Number(video.play) || 0,
+  };
+}
+
+async function updateBilibili(source, statuses) {
+  if (!source?.enabled || !source.uid) {
+    statuses.bilibili = emptyStatus();
+    return null;
+  }
+
+  try {
+    const baseHeaders = {
+      "User-Agent": BILIBILI_USER_AGENT,
+      Referer: `https://space.bilibili.com/${encodeURIComponent(source.uid)}/video`,
+    };
+    const fingerprint = await fetchJson("https://api.bilibili.com/x/frontend/finger/spi", { headers: baseHeaders });
+    const buvid3 = fingerprint.data?.b_3;
+    const buvid4 = fingerprint.data?.b_4;
+    const cookie = [buvid3 && `buvid3=${buvid3}`, buvid4 && `buvid4=${buvid4}`].filter(Boolean).join("; ");
+    const requestOptions = { headers: { ...baseHeaders, ...(cookie ? { Cookie: cookie } : {}) } };
+    let primaryError = "";
+    try {
+      const nav = await fetchJson("https://api.bilibili.com/x/web-interface/nav", requestOptions);
+      const imgUrl = nav.data?.wbi_img?.img_url;
+      const subUrl = nav.data?.wbi_img?.sub_url;
+      if (!imgUrl || !subUrl) throw new Error("WBI signing keys were not returned");
+      const query = signBilibiliParams(
+        { mid: source.uid, order: "pubdate", pn: 1, ps: 1 },
+        imgUrl,
+        subUrl,
+      );
+      const payload = await fetchJson(`https://api.bilibili.com/x/space/wbi/arc/search?${query}`, requestOptions);
+      if (payload.code !== 0) throw new Error(`API ${payload.code}: ${text(payload.message, "request failed")}`);
+      const video = payload.data?.list?.vlist?.[0];
+      if (!video?.bvid) throw new Error("no public videos returned");
+      statuses.bilibili = {
+        status: "ok",
+        updatedAt: new Date().toISOString(),
+        message: `latest video updated via WBI (${video.bvid})`,
+      };
+      return buildBilibiliActivity(source, {
+        bvid: video.bvid,
+        title: video.title,
+        description: video.description,
+        publishedAt: Number(video.created) * 1000,
+        play: video.play,
+        cover: video.pic,
+      });
+    } catch (error) {
+      primaryError = error.message;
+    }
+
+    const dynamicPayload = await fetchJson(
+      `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?host_mid=${encodeURIComponent(source.uid)}&features=itemOpusStyle,listOnlyfans,opusBigCover,forwardListHidden,commentsNewVersion`,
+      requestOptions,
+    );
+    if (dynamicPayload.code !== 0) {
+      throw new Error(`WBI ${primaryError}; dynamic API ${dynamicPayload.code}: ${text(dynamicPayload.message, "request failed")}`);
+    }
+    const dynamic = dynamicPayload.data?.items?.find((item) => item.type === "DYNAMIC_TYPE_AV");
+    const archive = dynamic?.modules?.module_dynamic?.major?.archive;
+    const bvid = archive?.bvid || archive?.jump_url?.match(/BV[0-9A-Za-z]+/)?.[0];
+    if (!bvid) throw new Error(`WBI ${primaryError}; dynamic API returned no video`);
+    statuses.bilibili = {
+      status: "ok",
+      updatedAt: new Date().toISOString(),
+      message: `latest video updated via dynamic fallback (${bvid})`,
+    };
+    return buildBilibiliActivity(source, {
+      bvid,
+      title: archive.title,
+      description: archive.desc,
+      publishedAt: Number(dynamic.modules?.module_author?.pub_ts) * 1000,
+      play: archive.stat?.play,
+      cover: archive.cover,
+    });
+  } catch (error) {
+    statuses.bilibili = { status: "error", updatedAt: new Date().toISOString(), message: error.message };
+    return null;
   }
 }
 
@@ -228,17 +366,37 @@ async function main() {
     throw error;
   });
   const env = { ...process.env, ...parseDotEnv(await readOptional(envPath)) };
+  const previousData = await readGeneratedData(outputPath);
   const statuses = {};
   const result = {
     generatedAt: new Date().toISOString(),
     sourceStatus: statuses,
   };
-  Object.assign(result, await updateGithub(config.github, env, statuses));
+  const githubUpdate = await updateGithub(config.github, env, statuses);
+  if (statuses.github?.status === "error" && previousData.github) {
+    result.github = {
+      ...previousData.github,
+      integrationNote: "UPDATE FAILED / USING LAST SUCCESSFUL DATA",
+    };
+    statuses.github.message = `${statuses.github.message}; using last successful data`;
+  } else {
+    Object.assign(result, githubUpdate);
+  }
 
   const activity = [];
   for (const [key, source] of Object.entries(config.social || {})) {
-    const item = await updateSocialSource(key, source, env, statuses);
-    if (item) activity.push(item);
+    const item = key === "bilibili" && source.provider === "bilibili"
+      ? await updateBilibili(source, statuses)
+      : await updateSocialSource(key, source, env, statuses);
+    if (item) {
+      activity.push(item);
+    } else if (source?.enabled && statuses[key]?.status === "error") {
+      const cachedItem = previousData.activity?.find((entry) => entry.source === key);
+      if (cachedItem) {
+        activity.push(cachedItem);
+        statuses[key].message = `${statuses[key].message}; using last successful data`;
+      }
+    }
   }
   if (activity.length) result.activity = activity;
 

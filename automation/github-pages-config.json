@@ -6,5 +6,13 @@
     "tokenEnv": "GITHUB_TOKEN",
     "eventsLimit": 8
   },
-  "social": {}
+  "social": {
+    "bilibili": {
+      "enabled": true,
+      "provider": "bilibili",
+      "uid": "56829848",
+      "platform": "哔哩哔哩",
+      "defaultType": "VIDEO"
+    }
+  }
 }

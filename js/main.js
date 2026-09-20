@@ -83,6 +83,18 @@ document.querySelectorAll("[data-activity-source]").forEach((row) => {
   const item = config.activity.find((activity) => activity.source === row.dataset.activitySource);
   if (!item) return;
   row.querySelectorAll("[data-activity-field]").forEach((field) => setText(field, item[field.dataset.activityField]));
+  row.querySelectorAll("[data-activity-link], [data-activity-title-link]").forEach((link) => {
+    if (!item.url) return;
+    link.href = item.url;
+    link.target = "_blank";
+    link.rel = "noreferrer";
+  });
+  const cover = row.querySelector("[data-activity-cover]");
+  if (cover && item.cover) {
+    cover.src = item.cover;
+    cover.hidden = false;
+    cover.referrerPolicy = "no-referrer";
+  }
 });
 
 const crosshairPresets = Object.fromEntries(config.crosshairs.map((preset) => [preset.key, preset]));
