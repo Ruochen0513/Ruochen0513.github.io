@@ -15,13 +15,14 @@
       "defaultType": "VIDEO"
     },
     "weibo": {
-      "enabled": false,
+      "enabled": true,
+      "provider": "weibo",
+      "uid": "YOUR_WEIBO_UID",
       "platform": "微博",
-      "url": "https://your-json-endpoint.example/weibo",
-      "tokenEnv": "WEIBO_TOKEN",
-      "itemsPath": "items",
       "defaultType": "POST",
-      "fieldMap": { "title": "text", "summary": "text", "time": "created_at", "url": "url" }
+      "includeReposts": true,
+      "requireCookie": true,
+      "cookieEnv": "WEIBO_COOKIE"
     },
     "netease": {
       "enabled": false,

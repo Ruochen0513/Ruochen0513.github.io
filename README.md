@@ -20,6 +20,8 @@ python3 -m http.server 4173
 
 B站最新投稿已通过后台 WBI 请求接入，展示封面、标题、简介、播放量、发布时间和原视频链接，无需在网页端配置 Cookie。
 
+微博最新动态已通过后台移动端接口接入，支持正文 HTML 清洗、长微博、图片、互动数据、置顶排序修正和原创/转发筛选。微博 Cookie 仅保存在本地 `.env` 或 GitHub Actions Secret 中。
+
 所有可配置内容集中在 [`js/config.js`](./js/config.js)，包括个人信息、社交链接、外设、三套准星代码、GitHub 状态和动态占位内容。GitHub 与社交动态建议通过 GitHub Actions 定时抓取公开数据并输出静态 JSON，避免在前端暴露令牌。
 
 ## 本地自动更新

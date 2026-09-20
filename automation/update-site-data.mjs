@@ -12,6 +12,7 @@ const DEFAULT_ENV = resolve(SCRIPT_DIR, ".env");
 const DEFAULT_OUTPUT = resolve(PROJECT_DIR, "data/site-data.js");
 const USER_AGENT = "PLAYER_HOME local data updater";
 const BILIBILI_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/131.0.0.0 Safari/537.36";
+const WEIBO_USER_AGENT = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Version/17.0 Mobile/15E148 Safari/604.1";
 const WBI_MIXIN_KEY_TABLE = [46, 47, 18, 2, 53, 8, 23, 32, 15, 50, 10, 31, 58, 3, 45, 35, 27, 43, 5, 49, 33, 9, 42, 19, 29, 28, 14, 39, 12, 38, 41, 13, 37, 48, 7, 16, 24, 55, 40, 61, 26, 17, 0, 1, 60, 51, 30, 4, 22, 25, 54, 21, 56, 59, 6, 63, 57, 62, 11, 36, 20, 34, 44, 52];
 
 const args = new Map();
@@ -81,6 +82,11 @@ function tokenFor(source, env) {
   return source?.tokenEnv ? env[source.tokenEnv] || process.env[source.tokenEnv] || "" : "";
 }
 
+function secretFor(source, key, env) {
+  const envName = source?.[key];
+  return envName ? env[envName] || process.env[envName] || "" : "";
+}
+
 async function fetchJson(url, { token = "", method = "GET", body, headers = {} } = {}) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 25_000);
@@ -139,6 +145,118 @@ function compactCount(value) {
 function compactText(value, maxLength = 96) {
   const normalized = text(value).replace(/\s+/g, " ");
   return normalized.length > maxLength ? `${normalized.slice(0, maxLength - 1)}…` : normalized;
+}
+
+function decodeHtmlEntities(value) {
+  const named = { amp: "&", apos: "'", gt: ">", lt: "<", nbsp: " ", quot: '"' };
+  return value.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (match, entity) => {
+    if (entity[0] === "#") {
+      const codePoint = entity[1]?.toLowerCase() === "x"
+        ? Number.parseInt(entity.slice(2), 16)
+        : Number.parseInt(entity.slice(1), 10);
+      return Number.isFinite(codePoint) ? String.fromCodePoint(codePoint) : match;
+    }
+    return named[entity.toLowerCase()] ?? match;
+  });
+}
+
+function htmlToPlainText(value) {
+  const source = text(value)
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, " ")
+    .replace(/<br\s*\/?>/gi, " ")
+    .replace(/<\/p\s*>/gi, " ")
+    .replace(/<[^>]+>/g, " ");
+  return decodeHtmlEntities(source).replace(/\s+/g, " ").trim();
+}
+
+function weiboTimestamp(value) {
+  const timestamp = Date.parse(value);
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+}
+
+function weiboImage(post) {
+  const mediaPost = post.pics?.length ? post : post.retweeted_status;
+  const picture = mediaPost?.pics?.[0];
+  return text(picture?.large?.url || picture?.url).replace(/^http:/, "https:");
+}
+
+function selectLatestWeiboPost(cards, includeReposts = true) {
+  return (cards || [])
+    .filter((card) => card.card_type === 9 && card.mblog)
+    .map((card) => card.mblog)
+    .filter((post) => includeReposts || !post.retweeted_status)
+    .sort((left, right) => weiboTimestamp(right.created_at) - weiboTimestamp(left.created_at))[0];
+}
+
+function buildWeiboActivity(source, post, rawText = post.text) {
+  const plainText = htmlToPlainText(rawText) || "微博动态";
+  const summaryText = compactText(plainText, 120);
+  const metrics = `${compactCount(post.reposts_count)} 转发 · ${compactCount(post.comments_count)} 评论 · ${compactCount(post.attitudes_count)} 赞`;
+  const bid = text(post.bid || post.mblogid || post.id);
+  return {
+    source: "weibo",
+    platform: text(source.platform, "微博"),
+    time: isoDate(post.created_at),
+    title: compactText(plainText, 42),
+    summary: `${summaryText} · ${metrics}`,
+    type: post.retweeted_status ? "REPOST" : text(source.defaultType, "POST"),
+    url: `https://weibo.com/${encodeURIComponent(source.uid)}/${encodeURIComponent(bid)}`,
+    cover: weiboImage(post),
+    postId: text(post.id),
+    reposts: Number(post.reposts_count) || 0,
+    comments: Number(post.comments_count) || 0,
+    likes: Number(post.attitudes_count) || 0,
+  };
+}
+
+async function updateWeibo(source, env, statuses) {
+  if (!source?.enabled || !source.uid) {
+    statuses.weibo = emptyStatus();
+    return null;
+  }
+
+  const cookie = secretFor(source, "cookieEnv", env);
+  if (!cookie && source.requireCookie !== false) {
+    statuses.weibo = { status: "error", updatedAt: new Date().toISOString(), message: `${source.cookieEnv || "WEIBO_COOKIE"} is not configured` };
+    return null;
+  }
+
+  try {
+    const headers = {
+      "User-Agent": WEIBO_USER_AGENT,
+      Referer: `https://m.weibo.cn/u/${encodeURIComponent(source.uid)}`,
+      ...(cookie ? { Cookie: cookie } : {}),
+    };
+    const url = new URL("https://m.weibo.cn/api/container/getIndex");
+    url.searchParams.set("type", "uid");
+    url.searchParams.set("value", source.uid);
+    url.searchParams.set("containerid", `107603${source.uid}`);
+    const payload = await fetchJson(url, { headers });
+    if (payload.ok !== 1) throw new Error(`Weibo API: ${text(payload.msg, "request failed")}`);
+
+    const post = selectLatestWeiboPost(payload.data?.cards, source.includeReposts !== false);
+    if (!post?.id) throw new Error("Weibo returned no timeline posts");
+
+    let rawText = post.text;
+    if (post.isLongText) {
+      try {
+        const extended = await fetchJson(`https://m.weibo.cn/statuses/extend?id=${encodeURIComponent(post.id)}`, { headers });
+        if (extended.ok === 1 && extended.data?.longTextContent) rawText = extended.data.longTextContent;
+      } catch {
+        // The timeline excerpt remains usable if the long-text endpoint is rate-limited.
+      }
+    }
+    statuses.weibo = {
+      status: "ok",
+      updatedAt: new Date().toISOString(),
+      message: `latest post updated (${post.id})`,
+    };
+    return buildWeiboActivity(source, post, rawText);
+  } catch (error) {
+    statuses.weibo = { status: "error", updatedAt: new Date().toISOString(), message: error.message };
+    return null;
+  }
 }
 
 function buildBilibiliActivity(source, video) {
@@ -385,9 +503,14 @@ async function main() {
 
   const activity = [];
   for (const [key, source] of Object.entries(config.social || {})) {
-    const item = key === "bilibili" && source.provider === "bilibili"
-      ? await updateBilibili(source, statuses)
-      : await updateSocialSource(key, source, env, statuses);
+    let item;
+    if (key === "bilibili" && source.provider === "bilibili") {
+      item = await updateBilibili(source, statuses);
+    } else if (key === "weibo" && source.provider === "weibo") {
+      item = await updateWeibo(source, env, statuses);
+    } else {
+      item = await updateSocialSource(key, source, env, statuses);
+    }
     if (item) {
       activity.push(item);
     } else if (source?.enabled && statuses[key]?.status === "error") {
@@ -411,7 +534,11 @@ async function main() {
   process.stdout.write(JSON.stringify({ output: outputPath, sourceStatus: statuses }, null, 2));
 }
 
-main().catch((error) => {
-  process.stderr.write(`[player-home-update] ${error.message}\n`);
-  process.exitCode = 1;
-});
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((error) => {
+    process.stderr.write(`[player-home-update] ${error.message}\n`);
+    process.exitCode = 1;
+  });
+}
+
+export { buildWeiboActivity, htmlToPlainText, selectLatestWeiboPost };

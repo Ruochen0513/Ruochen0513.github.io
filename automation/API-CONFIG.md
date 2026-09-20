@@ -58,9 +58,45 @@ B站最新投稿已经内置支持，不需要 Token 或 Cookie。在 `api-confi
 
 GitHub Pages 的线上配置位于 `automation/github-pages-config.json`。当前 UID 已设为 `56829848`，每天北京时间 03:00 随 GitHub 状态一起更新。B站可能调整或限制非官方 Web API；如果 `sourceStatus.bilibili` 出现风控错误，可改为自建 RSSHub 的通用 JSON 接口模式。
 
-## 4. 其他社交平台配置
+## 4. 微博最新动态
 
-微博、网易云和 Instagram 采用通用 JSON 接口适配器。每个平台需要一个能够返回 JSON 的接口地址，返回格式默认如下：
+微博移动端接口已经内置支持。当前 UID 已配置为 `3959317547`，会按实际发布时间选择最新微博，不会因为置顶微博排在首位而选错；正文会清除 HTML 后再写入页面，长微博会尽量读取完整正文。默认包含原创和转发，将 `includeReposts` 改为 `false` 可只显示原创微博。
+
+微博目前会拦截无 Cookie 的服务器请求，因此需要配置 `WEIBO_COOKIE`。Cookie 只放在服务端环境变量中，不会进入网页或 Git 历史。
+
+本地配置：登录 [微博移动版](https://m.weibo.cn)，打开浏览器开发者工具的 `Network`，刷新页面，选择发往 `m.weibo.cn` 的请求，在 `Request Headers` 中找到完整的 `Cookie` 值，写入本地 `automation/.env`：
+
+```dotenv
+WEIBO_COOKIE=SUB=...; SUBP=...; MLOGIN=1; ...
+```
+
+线上配置：进入 GitHub 仓库的 `Settings -> Secrets and variables -> Actions -> New repository secret`，创建：
+
+```text
+Name: WEIBO_COOKIE
+Secret: 上述完整 Cookie 值
+```
+
+然后在 `Actions -> Update site data -> Run workflow` 手动运行一次。Cookie 可能过期；若 `sourceStatus.weibo` 显示登录或风控错误，重新获取并覆盖 Secret 即可。抓取失败时会继续展示上一次成功的数据。
+
+配置结构：
+
+```json
+"weibo": {
+  "enabled": true,
+  "provider": "weibo",
+  "uid": "3959317547",
+  "platform": "微博",
+  "defaultType": "POST",
+  "includeReposts": true,
+  "requireCookie": true,
+  "cookieEnv": "WEIBO_COOKIE"
+}
+```
+
+## 5. 其他社交平台配置
+
+网易云和 Instagram 采用通用 JSON 接口适配器。每个平台需要一个能够返回 JSON 的接口地址，返回格式默认如下：
 
 ```json
 {
@@ -78,12 +114,12 @@ GitHub Pages 的线上配置位于 `automation/github-pages-config.json`。当�
 在 `api-config.json` 中开启对应来源并填写字段映射：
 
 ```json
-"weibo": {
+"netease": {
   "enabled": true,
-  "url": "https://your-api.example/weibo",
-  "tokenEnv": "WEIBO_TOKEN",
+  "url": "https://your-api.example/netease",
+  "tokenEnv": "NETEASE_TOKEN",
   "itemsPath": "items",
-  "defaultType": "POST",
+  "defaultType": "MUSIC",
   "fieldMap": {
     "title": "title",
     "summary": "description",
@@ -102,9 +138,9 @@ GitHub Pages 的线上配置位于 `automation/github-pages-config.json`。当�
 - `defaultType`: 动态类型，例如 `VIDEO`、`POST`、`MUSIC`、`PHOTO`。
 - `fieldMap`: 把接口字段映射到主页字段；字段支持点号路径。
 
-微博、网易云和 Instagram 是否能直接使用官方接口，取决于账号权限和平台开放能力。不要把网页登录 Cookie 写入配置；需要 OAuth 的平台应使用官方 Token，并放入 `.env`。
+网易云和 Instagram 是否能直接使用官方接口，取决于账号权限和平台开放能力。需要 OAuth 的平台应使用官方 Token，并放入 `.env`。
 
-## 5. 手动测试
+## 6. 手动测试
 
 配置好后，在项目根目录运行：
 
@@ -126,7 +162,7 @@ data/site-data.js
 
 每个来源的成功、跳过或失败原因会写入生成文件中的 `sourceStatus`，一个平台失败不会阻塞其他平台。
 
-## 6. 每日 03:00 定时任务
+## 7. 每日 03:00 定时任务
 
 当前机器已经安装并启用了 `player-home-update.timer`，每天 `03:00:00` 运行。修改 API 配置后不需要重新安装定时器。需要在其他电脑部署时，执行一次：
 
@@ -153,11 +189,11 @@ journalctl --user -u player-home-update.service -n 50 --no-pager
 ./automation/uninstall-schedule.sh
 ```
 
-## 7. 主页刷新
+## 8. 主页刷新
 
 静态页面不会被后台主动推送。定时任务更新数据后，重新打开或刷新主页即可看到最新状态。当前本地服务器地址为 `http://localhost:4173`。
 
-## 8. GitHub Pages 自动更新
+## 9. GitHub Pages 自动更新
 
 仓库中的 `.github/workflows/update-site-data.yml` 会在每天北京时间 03:00 运行，拉取 GitHub 状态，在 Actions 环境中生成新的 `data/site-data.js` 并直接部署站点。它不会向 `main` 分支提交生成文件，因此不会造成日常本地推送冲突。这个流程不依赖本机开机。
 

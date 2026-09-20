@@ -33,9 +33,13 @@ jobs:
         with:
           node-version: 20
 
-      - name: Fetch GitHub data
+      - name: Test data adapters
+        run: node --test automation/update-site-data.test.mjs
+
+      - name: Fetch site data
         env:
           GITHUB_TOKEN: ${{ secrets.PROFILE_GITHUB_TOKEN || github.token }}
+          WEIBO_COOKIE: ${{ secrets.WEIBO_COOKIE }}
         run: >-
           node automation/update-site-data.mjs
           --config automation/github-pages-config.json

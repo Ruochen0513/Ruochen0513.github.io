@@ -13,6 +13,16 @@
       "uid": "56829848",
       "platform": "哔哩哔哩",
       "defaultType": "VIDEO"
+    },
+    "weibo": {
+      "enabled": true,
+      "provider": "weibo",
+      "uid": "3959317547",
+      "platform": "微博",
+      "defaultType": "POST",
+      "includeReposts": true,
+      "requireCookie": true,
+      "cookieEnv": "WEIBO_COOKIE"
     }
   }
 }
