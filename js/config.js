@@ -3,6 +3,7 @@ window.PLAYER_HOME_CONFIG = {
   profile: {
     nickname: "Salieri",
     handle: "@ruochen0513",
+    email: "yuhaozhang@mail.nankai.edu.cn",
     bio: "普通研究生，热爱游戏与音乐",
     school: "Nankai University",
     birthday: "13 / 05",
@@ -85,6 +86,5 @@ window.PLAYER_HOME_CONFIG = {
     { source: "bilibili", platform: "哔哩哔哩", time: "等待同步", title: "最新视频动态将在这里显示", summary: "标题、发布时间、封面和链接接入后自动更新。", type: "VIDEO" },
     { source: "weibo", platform: "微博", time: "等待同步", title: "最新微博将在这里显示", summary: "文字、图片与原始动态链接会汇总到这一条时间线。", type: "POST" },
     { source: "netease", platform: "网易云音乐", time: "等待同步", title: "本周常听将在这里显示", summary: "每周排行、艺人、专辑与歌曲链接会自动更新。", type: "WEEKLY TOP" },
-    { source: "instagram", platform: "Instagram", time: "等待同步", title: "最新图片动态将在这里显示", summary: "接入公开数据后，这里会展示缩略图与动态摘要。", type: "PHOTO" },
   ],
 };

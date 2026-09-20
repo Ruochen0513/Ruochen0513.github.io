@@ -140,53 +140,7 @@ Cookie 只会传给后台更新脚本，不会写入 `data/site-data.js`、网�
 
 更新器会改为请求 `https://your-netease-api.example.com/user/record?uid=...&type=1`。
 
-## 6. Instagram 通用接口配置
-
-Instagram 仍采用通用 JSON 接口适配器。接口返回格式默认如下：
-
-```json
-{
-  "items": [
-    {
-      "title": "动态标题",
-      "description": "动态摘要",
-      "published_at": "2026-09-18T03:00:00+08:00",
-      "url": "https://example.com/post/1"
-    }
-  ]
-}
-```
-
-在 `api-config.json` 中开启对应来源并填写字段映射：
-
-```json
-"instagram": {
-  "enabled": true,
-  "url": "https://your-api.example/instagram",
-  "tokenEnv": "INSTAGRAM_TOKEN",
-  "itemsPath": "items",
-  "defaultType": "PHOTO",
-  "fieldMap": {
-    "title": "title",
-    "summary": "description",
-    "time": "published_at",
-    "url": "url"
-  }
-}
-```
-
-字段说明：
-
-- `enabled`: `true` 才会请求该来源。
-- `url`: 返回 JSON 的接口地址。
-- `tokenEnv`: 可选，对应 `.env` 中的环境变量名；脚本会用 Bearer Token 请求。
-- `itemsPath`: 数据数组路径，例如 `items` 或 `data.items`。
-- `defaultType`: 动态类型，例如 `VIDEO`、`POST`、`MUSIC`、`PHOTO`。
-- `fieldMap`: 把接口字段映射到主页字段；字段支持点号路径。
-
-需要 OAuth 的接口 Token 应只放入 `.env` 或 GitHub Actions Secret。
-
-## 7. 手动测试
+## 6. 手动测试
 
 配置好后，在项目根目录运行：
 
@@ -208,7 +162,7 @@ data/site-data.js
 
 每个来源的成功、跳过或失败原因会写入生成文件中的 `sourceStatus`，一个平台失败不会阻塞其他平台。
 
-## 8. 每日 03:00 定时任务
+## 7. 每日 03:00 定时任务
 
 当前机器已经安装并启用了 `player-home-update.timer`，每天 `03:00:00` 运行。修改 API 配置后不需要重新安装定时器。需要在其他电脑部署时，执行一次：
 
@@ -235,11 +189,11 @@ journalctl --user -u player-home-update.service -n 50 --no-pager
 ./automation/uninstall-schedule.sh
 ```
 
-## 9. 主页刷新
+## 8. 主页刷新
 
 静态页面不会被后台主动推送。定时任务更新数据后，重新打开或刷新主页即可看到最新状态。当前本地服务器地址为 `http://localhost:4173`。
 
-## 10. GitHub Pages 自动更新
+## 9. GitHub Pages 自动更新
 
 仓库中的 `.github/workflows/update-site-data.yml` 会在每天北京时间 03:00 运行，拉取 GitHub 状态，在 Actions 环境中生成新的 `data/site-data.js` 并直接部署站点。它不会向 `main` 分支提交生成文件，因此不会造成日常本地推送冲突。这个流程不依赖本机开机。
 

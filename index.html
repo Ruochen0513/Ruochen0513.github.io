@@ -124,6 +124,7 @@
               <span class="data-label">DISPLAY NAME</span>
               <h3 data-config="profile.nickname">你的昵称</h3>
               <p data-config="profile.handle">@your_handle</p>
+              <a class="profile-email" data-profile-email data-config="profile.email" href="mailto:yuhaozhang@mail.nankai.edu.cn">yuhaozhang@mail.nankai.edu.cn</a>
             </div>
 
             <dl class="profile-data">
@@ -307,17 +308,6 @@
           <p>ACTIVITY</p>
         </div>
 
-        <div class="feed-toolbar reveal">
-          <div class="feed-filters" role="group" aria-label="动态来源筛选">
-            <button class="feed-filter is-active" type="button" data-filter="all">全部</button>
-            <button class="feed-filter" type="button" data-filter="bilibili">B站</button>
-            <button class="feed-filter" type="button" data-filter="weibo">微博</button>
-            <button class="feed-filter" type="button" data-filter="netease">网易云</button>
-            <button class="feed-filter" type="button" data-filter="instagram">INS</button>
-          </div>
-          <div class="sync-state"><span></span>SYNC READY</div>
-        </div>
-
         <div class="activity-feed" aria-live="polite">
           <article class="feed-item reveal" data-activity-source="bilibili">
             <div class="feed-item__media"><img data-activity-cover alt="最新 B 站视频封面" hidden /><span class="feed-item__platform feed-item__platform--bilibili">B</span></div>
@@ -334,12 +324,6 @@
             <div class="feed-item__body"><div class="feed-item__meta"><strong data-activity-field="platform">网易云音乐</strong><time data-activity-field="time">等待同步</time></div><h3><a data-activity-title-link data-activity-field="title">本周常听将在这里显示</a></h3><p data-activity-field="summary">每周排行、艺人、专辑与歌曲链接会自动更新。</p><ol class="music-ranking" data-music-ranking hidden></ol></div>
             <a class="feed-item__link" data-activity-link aria-label="打开网易云本周首位歌曲"><span data-activity-field="type">WEEKLY TOP</span><span aria-hidden="true">↗</span></a>
           </article>
-          <article class="feed-item reveal" data-activity-source="instagram">
-            <div class="feed-item__platform feed-item__platform--instagram">IG</div>
-            <div class="feed-item__body"><div class="feed-item__meta"><strong data-activity-field="platform">Instagram</strong><time data-activity-field="time">等待同步</time></div><h3 data-activity-field="title">最新图片动态将在这里显示</h3><p data-activity-field="summary">接入公开数据后，这里会展示缩略图与动态摘要。</p></div>
-            <span class="feed-item__type" data-activity-field="type">PHOTO</span>
-          </article>
-          <div class="feed-empty" hidden>该频道暂时没有动态。</div>
         </div>
       </section>
     </main>

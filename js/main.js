@@ -31,6 +31,12 @@ document.querySelectorAll("[data-config]").forEach((element) => {
   setText(element, readPath(config, element.dataset.config));
 });
 
+const profileEmail = document.querySelector("[data-profile-email]");
+if (profileEmail && config.profile.email) {
+  profileEmail.href = `mailto:${config.profile.email.trim()}`;
+  profileEmail.setAttribute("aria-label", `发送邮件至 ${config.profile.email}`);
+}
+
 document.querySelectorAll("[data-stat]").forEach((element) => {
   const item = config.quickStats[element.dataset.stat];
   if (!item) return;
@@ -232,22 +238,6 @@ document.querySelector("[data-copy-crosshair]")?.addEventListener("click", async
   } catch {
     copyStatus.textContent = "复制失败，请手动选择代码";
   }
-});
-
-const feedItems = [...document.querySelectorAll(".feed-item")];
-const feedEmpty = document.querySelector(".feed-empty");
-document.querySelectorAll("[data-filter]").forEach((button) => {
-  button.addEventListener("click", () => {
-    const filter = button.dataset.filter;
-    document.querySelectorAll("[data-filter]").forEach((item) => item.classList.toggle("is-active", item === button));
-    let visibleCount = 0;
-    feedItems.forEach((item) => {
-      const isVisible = filter === "all" || item.dataset.activitySource === filter;
-      item.hidden = !isVisible;
-      if (isVisible) visibleCount += 1;
-    });
-    feedEmpty.hidden = visibleCount > 0;
-  });
 });
 
 document.querySelectorAll("a[aria-disabled='true']").forEach((link) => {

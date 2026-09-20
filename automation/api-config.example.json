@@ -33,15 +33,6 @@
       "recordType": 1,
       "limit": 3,
       "cookieEnv": "MUSIC_COOKIE"
-    },
-    "instagram": {
-      "enabled": false,
-      "platform": "Instagram",
-      "url": "https://your-json-endpoint.example/instagram",
-      "tokenEnv": "INSTAGRAM_TOKEN",
-      "itemsPath": "items",
-      "defaultType": "PHOTO",
-      "fieldMap": { "title": "caption", "summary": "caption", "time": "timestamp", "url": "permalink" }
     }
   }
 }
