@@ -87,6 +87,7 @@ img { display: block; max-width: 100%; }
 }
 .boot-screen.is-hidden { opacity: 0; visibility: hidden; }
 .boot-screen__mark {
+  position: relative;
   display: grid;
   width: 72px;
   height: 72px;
@@ -97,6 +98,10 @@ img { display: block; max-width: 100%; }
   font-weight: 900;
   font-size: 24px;
 }
+.boot-screen__logo { width: 100%; height: 100%; image-rendering: pixelated; }
+.boot-screen__fallback { display: none; place-items: center; }
+.boot-screen__mark.is-failed .boot-screen__logo { display: none; }
+.boot-screen__mark.is-failed .boot-screen__fallback { display: grid; }
 .boot-screen__bar { width: 220px; height: 10px; border: 2px solid var(--line); padding: 2px; }
 .boot-screen__bar span { display: block; height: 100%; background: var(--purple-bright); animation: boot 1s steps(8) forwards; }
 .boot-screen p { margin: 0; color: var(--muted); font-size: 12px; }
@@ -119,7 +124,11 @@ img { display: block; max-width: 100%; }
 }
 
 .brand, .footer-brand { display: inline-flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 800; }
-.brand__pixel { width: 14px; height: 14px; background: var(--purple-bright); box-shadow: 5px 5px 0 #4c3183; clip-path: polygon(0 0,75% 0,75% 25%,100% 25%,100% 100%,25% 100%,25% 75%,0 75%); }
+.brand__mark { position: relative; display: grid; width: 30px; height: 30px; flex: 0 0 auto; place-items: center; }
+.brand__logo { width: 30px; height: 30px; image-rendering: pixelated; }
+.brand__pixel { display: none; width: 14px; height: 14px; background: var(--purple-bright); box-shadow: 5px 5px 0 #4c3183; clip-path: polygon(0 0,75% 0,75% 25%,100% 25%,100% 100%,25% 100%,25% 75%,0 75%); }
+.brand__mark.is-failed .brand__logo { display: none; }
+.brand__mark.is-failed .brand__pixel { display: block; }
 .site-nav { display: flex; gap: 26px; }
 .site-nav a { position: relative; color: var(--muted); font-size: 12px; transition: color .15s steps(2); }
 .site-nav a::after { position: absolute; left: 0; right: 100%; bottom: -8px; height: 2px; content: ""; background: var(--purple-bright); transition: right .2s steps(4); }

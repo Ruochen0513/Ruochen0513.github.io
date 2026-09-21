@@ -27,6 +27,11 @@ const setText = (element, value) => {
   if (element && value !== undefined && value !== null) element.textContent = value;
 };
 
+// Keep the layout branded even if a future custom logo file is missing.
+document.querySelectorAll(".brand__logo, .boot-screen__logo").forEach((logo) => {
+  logo.addEventListener("error", () => logo.parentElement?.classList.add("is-failed"));
+});
+
 document.querySelectorAll("[data-config]").forEach((element) => {
   setText(element, readPath(config, element.dataset.config));
 });
