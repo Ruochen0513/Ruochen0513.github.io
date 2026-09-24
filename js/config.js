@@ -29,7 +29,7 @@ window.PLAYER_HOME_CONFIG = {
   gear: [
     { key: "mouse", name: "鼠标", model: "ATK F1 V2", metaLabel: "DPI", metaValue: "800x0.35" },
     { key: "keyboard", name: "键盘", model: "looting 66", metaLabel: "SWITCH", metaValue: "----" },
-    { key: "headset", name: "耳机", model: "RAZER KRAKEN X", metaLabel: "MODE", metaValue: "STEREO" },
+    { key: "headset", name: "耳机", model: "竹林鸟 霜华-Z2-贰", metaLabel: "MODE", metaValue: "STEREO" },
     { key: "mousepad", name: "鼠标垫", model: "Spacepad 奈雪-绝影-pro", metaLabel: "SIZE", metaValue: "3mm,450x400mm" },
   ],
 
