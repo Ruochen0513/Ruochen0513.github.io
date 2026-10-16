@@ -90,6 +90,81 @@ document.querySelectorAll("[data-commit]").forEach((row) => {
   setText(row.querySelector("time"), item.time);
 });
 
+// Project selections and editorial copy are always controlled by config.js.
+// Scheduled activity updates must not replace the selected repositories.
+const projectList = document.querySelector("[data-project-list]");
+const projects = (window.PLAYER_HOME_CONFIG.projects || []).filter((project) =>
+  /^[a-z\d](?:[a-z\d-]*[a-z\d])?\/[a-z\d._-]+$/i.test(project.repo || ""),
+);
+const projectsDirectory = document.querySelector("[data-projects-directory]");
+if (projectsDirectory) {
+  projectsDirectory.href = `https://github.com/${encodeURIComponent(config.github.username)}?tab=repositories`;
+}
+setText(document.querySelector("[data-projects-count]"), `${String(projects.length).padStart(2, "0")} PROJECTS`);
+const projectsEmpty = document.querySelector("[data-projects-empty]");
+if (projectsEmpty) projectsEmpty.hidden = projects.length > 0;
+
+projects.forEach((project, index) => {
+  const card = document.createElement("article");
+  card.className = "project-card reveal";
+  const identity = document.createElement("div");
+  identity.className = "project-card__identity";
+  const number = document.createElement("span");
+  number.className = "project-card__number";
+  number.textContent = String(index + 1).padStart(2, "0");
+  const category = document.createElement("span");
+  category.className = "data-label";
+  category.textContent = project.category || "OPEN SOURCE";
+  const heading = document.createElement("h3");
+  const titleLink = document.createElement("a");
+  titleLink.href = `https://github.com/${project.repo}`;
+  titleLink.target = "_blank";
+  titleLink.rel = "noreferrer";
+  titleLink.textContent = project.name || project.repo.split("/")[1];
+  heading.append(titleLink);
+  const repository = document.createElement("p");
+  repository.className = "project-card__repo";
+  repository.textContent = project.repo;
+  identity.append(number, category, heading, repository);
+
+  const body = document.createElement("div");
+  body.className = "project-card__body";
+  const description = document.createElement("p");
+  description.className = "project-card__description";
+  description.textContent = project.description || "项目介绍正在整理中。";
+  body.append(description);
+  if (project.highlights?.length) {
+    const highlights = document.createElement("ul");
+    highlights.className = "project-card__highlights";
+    project.highlights.forEach((text) => {
+      const item = document.createElement("li");
+      item.textContent = text;
+      highlights.append(item);
+    });
+    body.append(highlights);
+  }
+  if (project.tags?.length) {
+    const tags = document.createElement("ul");
+    tags.className = "project-card__tags";
+    tags.setAttribute("aria-label", "技术与方向");
+    project.tags.forEach((text) => {
+      const tag = document.createElement("li");
+      tag.textContent = text;
+      tags.append(tag);
+    });
+    body.append(tags);
+  }
+  const link = document.createElement("a");
+  link.className = "pixel-button project-card__link";
+  link.href = titleLink.href;
+  link.target = "_blank";
+  link.rel = "noreferrer";
+  link.setAttribute("aria-label", `查看 ${titleLink.textContent} 的 GitHub 仓库`);
+  link.textContent = "查看仓库 ↗";
+  card.append(identity, body, link);
+  projectList?.append(card);
+});
+
 document.querySelectorAll("[data-activity-source]").forEach((row) => {
   const item = config.activity.find((activity) => activity.source === row.dataset.activitySource);
   if (!item) return;
@@ -155,6 +230,7 @@ menuButton?.addEventListener("click", () => {
 navLinks.forEach((link) => {
   link.addEventListener("click", () => {
     menuButton?.setAttribute("aria-expanded", "false");
+    menuButton?.setAttribute("aria-label", "打开导航");
     siteNav?.classList.remove("is-open");
   });
 });

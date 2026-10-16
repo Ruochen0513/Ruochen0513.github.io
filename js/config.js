@@ -38,20 +38,20 @@ window.PLAYER_HOME_CONFIG = {
       key: "1322",
       tabLabel: "01 1322",
       name: "1322",
-      color: "青色",
+      color: "白色",
       outline: "关闭",
       center: "关闭",
-      previewColor: "#61f3e2",
+      previewColor: "#f5f3fa",
       code: "0;p;0;s;1;P;h;0;f;0;m;1;0l;3;0v;3;0o;2;0a;1;0f;0;1b;0;A;o;0.8;d;1;z;1;m;1;0b;0;1b;0;S;c;0;o;1",
     },
     {
       key: "solid",
       tabLabel: "02 实心十字",
       name: "实心十字",
-      color: "绿色",
+      color: "白色",
       outline: "关闭",
       center: "关闭",
-      previewColor: "#94c973",
+      previewColor: "#f5f3fa",
       code: "0;P;h;0;f;0;0l;5;0o;0;0a;1;0f;0;1b;0",
     },
     {
@@ -81,6 +81,35 @@ window.PLAYER_HOME_CONFIG = {
       { title: "支持展示 Push、Star 与 Release", source: "public activity", time: "--" },
     ],
   },
+
+  // Displayed in this order. Each entry has repo ("owner/name"), name,
+  // category, description, highlights (string[]), and tags (string[]).
+  projects: [
+    {
+      repo: "Ruochen0513/obsidian-simple-ms-todo-plugin",
+      name: "Simple Microsoft To Do for Obsidian",
+      category: "OBSIDIAN PLUGIN",
+      description: "把 Microsoft To Do 带进 Obsidian 侧边栏，在记录笔记的同时管理待办。无需来回切换窗口，就能查看不同清单、添加任务和更新完成状态，让笔记与日常计划衔接起来。",
+      highlights: [
+        "支持多个任务清单，可创建清单、添加任务及重新打开已完成事项。",
+        "直接编辑任务备注、截止日期和重要标记。",
+        "将清单、任务、备注和检查步骤写入 Markdown 笔记，方便集中查阅。",
+      ],
+      tags: ["Obsidian", "Microsoft To Do", "Markdown", "OAuth2"],
+    },
+    {
+      repo: "Ruochen0513/GPT-Usage-Indicator",
+      name: "GPT Usage Indicator",
+      category: "DESKTOP UTILITY",
+      description: "在桌面上随时查看 Codex 的 5 小时与 7 天订阅额度，快速了解剩余用量和重置时间。提供 GNOME 顶栏扩展及 Windows、macOS 桌面应用，方便在编码时掌握额度消耗。",
+      highlights: [
+        "提供百分比、双环、进度条和环图加数字四种视图，支持剩余／已用切换。",
+        "支持多账号切换、自动刷新，以及重置时间查看。",
+        "通过官方授权页面登录；查询失败或数据过期时明确提示状态。",
+      ],
+      tags: ["Python", "GNOME", "Windows", "macOS"],
+    },
+  ],
 
   activity: [
     { source: "bilibili", platform: "哔哩哔哩", time: "等待同步", title: "最新视频动态将在这里显示", summary: "标题、发布时间、封面和链接接入后自动更新。", type: "VIDEO" },

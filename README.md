@@ -14,6 +14,7 @@ python3 -m http.server 4173
 
 - 个人资料和社交链接
 - 鼠标、键盘、耳机、鼠标垫
+- 精选 GitHub 项目、项目介绍、功能亮点与技术标签
 - 无畏契约准星预览与代码复制
 - GitHub 贡献日期图与活动列表
 - B站、微博、网易云音乐聚合动态
@@ -25,6 +26,25 @@ B站最新投稿已通过后台 WBI 请求接入，展示封面、标题、简�
 网易云音乐已接入最近一周听歌排行，展示本周常听 Top 3、歌曲封面、艺人、专辑和歌曲链接。该数据是周排行而非精确播放历史；接口不提供播放次数时，页面会显示排行热度。`MUSIC_COOKIE` 为可选的后台凭证，不会进入网页。
 
 所有可配置内容集中在 [`js/config.js`](./js/config.js)，包括个人信息、邮箱、社交链接、外设、三套准星代码、GitHub 状态和动态占位内容。邮箱修改 `profile.email` 即可，页面显示内容和 `mailto:` 链接会同步更新。GitHub 与社交动态建议通过 GitHub Actions 定时抓取公开数据并输出静态 JSON，避免在前端暴露令牌。
+
+## 项目展示
+
+“项目”位于桌面外设之后、准星分享之前，默认展示 Simple Microsoft To Do for Obsidian 和 GPT Usage Indicator。在 `js/config.js` 中编辑 `projects` 数组即可指定展示的仓库，数组顺序就是页面展示顺序：
+
+```js
+projects: [
+  {
+    repo: "Ruochen0513/Ruochen0513.github.io",
+    name: "SALIERI_HOME",
+    category: "PERSONAL WEBSITE",
+    description: "像素风个人主页，将个人档案、桌面外设、准星分享和社交动态汇总到一个页面。",
+    highlights: ["支持切换准星方案并复制导入代码", "通过后台定时任务同步 GitHub 与社交动态"],
+    tags: ["HTML", "CSS", "JavaScript", "GitHub Pages"],
+  },
+],
+```
+
+`repo` 使用 `所有者/仓库名` 格式，页面据此生成 GitHub 链接；`description` 是主要介绍，`highlights` 和 `tags` 可省略。项目介绍在本地静态渲染，无需浏览器调用 GitHub API；定时动态更新不会覆盖项目选择和介绍。列表为空时显示整理提示与 GitHub 仓库入口。
 
 ## 本地自动更新
 

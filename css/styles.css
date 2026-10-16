@@ -292,18 +292,21 @@ img { display: block; max-width: 100%; }
 .target-grid__v, .target-grid__h { position: absolute; z-index: 1; top: 50%; left: 50%; background: rgba(255,255,255,.08); }
 .target-grid__v { width: 1px; height: 70%; transform: translate(-50%,-50%); }
 .target-grid__h { width: 70%; height: 1px; transform: translate(-50%,-50%); }
-.crosshair-shape { position: absolute; z-index: 3; top: 50%; left: 50%; width: 64px; height: 64px; transform: translate(-50%,-50%); color: #61f3e2; filter: drop-shadow(1px 1px 0 rgba(0,0,0,.8)); }
-.crosshair-dot { position: absolute; top: 29px; left: 29px; display: none; width: 6px; height: 6px; background: currentColor; }
+.crosshair-shape { position: absolute; z-index: 3; top: 50%; left: 50%; width: 10px; height: 10px; transform: translate(-50%,-50%); color: #f5f3fa; }
+.crosshair-dot { position: absolute; inset: 0; display: none; border: 2px solid #111; border-radius: 50%; background: currentColor; }
 .crosshair-line { position: absolute; display: none; background: currentColor; }
-.crosshair-line--top,.crosshair-line--bottom { left: 30px; width: 4px; height: 16px; }
-.crosshair-line--left,.crosshair-line--right { top: 30px; width: 16px; height: 4px; }
-.crosshair-line--top { top: 4px; }.crosshair-line--bottom { bottom: 4px; }.crosshair-line--left { left: 4px; }.crosshair-line--right { right: 4px; }
+/* Match the supplied in-game references at their native pixel size. */
+.crosshair-line--top,.crosshair-line--bottom { left: 4px; width: 2px; height: 3px; }
+.crosshair-line--left,.crosshair-line--right { top: 4px; width: 3px; height: 2px; }
+.crosshair-line--top { top: 0; }.crosshair-line--bottom { bottom: 0; }.crosshair-line--left { left: 0; }.crosshair-line--right { right: 0; }
 .crosshair-shape[data-crosshair-shape="1322"] .crosshair-line { display: block; }
-.crosshair-shape[data-crosshair-shape="solid"] .crosshair-line { display: block; width: 6px; height: 30px; }
-.crosshair-shape[data-crosshair-shape="solid"] .crosshair-line--top { top: 0; left: 29px; }
-.crosshair-shape[data-crosshair-shape="solid"] .crosshair-line--bottom { bottom: 0; left: 29px; }
-.crosshair-shape[data-crosshair-shape="solid"] .crosshair-line--left { top: 29px; left: 0; width: 30px; height: 6px; }
-.crosshair-shape[data-crosshair-shape="solid"] .crosshair-line--right { top: 29px; right: 0; width: 30px; height: 6px; }
+.crosshair-shape[data-crosshair-shape="solid"] { width: 8px; height: 8px; }
+.crosshair-shape[data-crosshair-shape="solid"] .crosshair-line { display: block; }
+.crosshair-shape[data-crosshair-shape="solid"] .crosshair-line--top,
+.crosshair-shape[data-crosshair-shape="solid"] .crosshair-line--bottom { left: 3px; width: 2px; height: 4px; }
+.crosshair-shape[data-crosshair-shape="solid"] .crosshair-line--left,
+.crosshair-shape[data-crosshair-shape="solid"] .crosshair-line--right { top: 3px; width: 4px; height: 2px; }
+.crosshair-shape[data-crosshair-shape="dot"] { width: 6px; height: 6px; }
 .crosshair-shape[data-crosshair-shape="dot"] .crosshair-dot { display: block; }
 .crosshair-controls { display: flex; min-width: 0; flex-direction: column; padding: 24px; }
 .crosshair-tabs { display: grid; grid-template-columns: repeat(3,1fr); border: 1px solid var(--line); }
@@ -353,6 +356,29 @@ img { display: block; max-width: 100%; }
 .commit-list strong, .commit-list small { display: block; }
 .commit-list strong { font-size: 13px; }
 .commit-list small, .commit-list time { color: var(--dim); font-size: 10px; }
+
+.projects-intro { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 30px; }
+.projects-intro p { max-width: 65ch; margin: 0; color: var(--muted); font-size: 14px; }
+.projects-directory { flex: 0 0 auto; padding: 10px 0; color: var(--lavender); font-size: 12px; }
+.projects-directory:hover { color: var(--cyan); }
+.projects-toolbar { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 2px solid var(--purple-bright); color: var(--muted); font-size: 10px; }
+.projects-toolbar > span:last-child { color: var(--purple-bright); }
+.project-list { display: grid; }
+.project-card { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr) auto; align-items: start; gap: 32px; padding: 34px 20px; border-bottom: 1px solid var(--line); background: var(--bg-soft); }
+.project-card:nth-child(even) { background: var(--bg); }
+.project-card__identity, .project-card__body { min-width: 0; }
+.project-card__number { display: block; margin-bottom: 14px; color: var(--dim); font-size: 12px; }
+.project-card h3 { margin: 8px 0 6px; overflow-wrap: anywhere; font-size: 21px; line-height: 1.4; }
+.project-card h3 a:hover { color: var(--cyan); }
+.project-card__repo { margin: 0; overflow-wrap: anywhere; color: var(--muted); font-size: 10px; }
+.project-card__description { max-width: 65ch; margin: 0; color: var(--ink); font-size: 14px; line-height: 1.85; }
+.project-card__highlights { display: grid; gap: 6px; margin: 16px 0 0; padding-left: 18px; color: var(--muted); font-size: 12px; line-height: 1.8; list-style-type: square; }
+.project-card__highlights li::marker { color: var(--purple-bright); }
+.project-card__tags { display: flex; flex-wrap: wrap; gap: 7px; margin: 20px 0 0; padding: 0; list-style: none; }
+.project-card__tags li { padding: 3px 8px; border: 1px solid var(--line); color: var(--lavender); font-size: 10px; }
+.project-card__link { margin-top: 28px; white-space: nowrap; font-size: 11px; }
+.projects-empty { margin-top: 20px; padding: 28px; color: var(--muted); font-size: 14px; }
+.projects-empty[hidden] { display: none; }
 
 .activity-section { padding-top: 100px; }
 .activity-feed { display: grid; min-height: 320px; gap: 14px; }
@@ -411,6 +437,8 @@ img { display: block; max-width: 100%; }
   .gear-item__meta { display: none; }
   .gear-item h3 { font-size: 18px; }
   .gear-item p { font-size: 14px; }
+  .project-card { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 20px 28px; }
+  .project-card__link { grid-column: 2; justify-self: start; margin-top: 0; }
 }
 
 @media (max-width: 680px) {
@@ -462,6 +490,11 @@ img { display: block; max-width: 100%; }
     gap: 2px;
   }
   .github-metrics strong { font-size: 23px; }
+  .projects-intro { align-items: start; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+  .project-card { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 26px 16px; }
+  .project-card__number { margin-bottom: 10px; }
+  .project-card h3 { font-size: 20px; }
+  .project-card__link { grid-column: 1; }
   .feed-item { min-height: 0; grid-template-columns: 78px minmax(0,1fr); gap: 14px; padding: 16px 14px; }
   .feed-item__media { width: 78px; height: 62px; }
   .feed-item__platform { width: 42px; height: 42px; }

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="个人主页，集中展示个人信息、外设、无畏契约准星、GitHub 状态与社交动态。"
+      content="个人主页，集中展示个人信息、外设、无畏契约准星、GitHub 状态、精选项目与社交动态。"
     />
     <meta name="theme-color" content="#090a0f" />
     <title>SALIERI_HOME // 个人主页</title>
@@ -50,9 +50,10 @@
       <nav class="site-nav" id="site-nav" aria-label="主要导航">
         <a href="#profile">01 资料</a>
         <a href="#gear">02 外设</a>
-        <a href="#crosshair">03 准星</a>
-        <a href="#github">04 GitHub</a>
-        <a href="#activity">05 动态</a>
+        <a href="#projects">03 项目</a>
+        <a href="#crosshair">04 准星</a>
+        <a href="#github">05 GitHub</a>
+        <a href="#activity">06 动态</a>
       </nav>
 
       <div class="header-status" aria-label="网站状态">
@@ -109,8 +110,8 @@
 
       <div class="system-strip" aria-hidden="true">
         <div class="system-strip__track">
-          <span>PROFILE</span><i></i><span>GEAR</span><i></i><span>CROSSHAIR</span><i></i><span>GITHUB</span><i></i><span>ACTIVITY</span><i></i>
-          <span>PROFILE</span><i></i><span>GEAR</span><i></i><span>CROSSHAIR</span><i></i><span>GITHUB</span><i></i><span>ACTIVITY</span><i></i>
+          <span>PROFILE</span><i></i><span>GEAR</span><i></i><span>PROJECTS</span><i></i><span>CROSSHAIR</span><i></i><span>GITHUB</span><i></i><span>ACTIVITY</span><i></i>
+          <span>PROFILE</span><i></i><span>GEAR</span><i></i><span>PROJECTS</span><i></i><span>CROSSHAIR</span><i></i><span>GITHUB</span><i></i><span>ACTIVITY</span><i></i>
         </div>
       </div>
 
@@ -216,9 +217,29 @@
         </div>
       </section>
 
+      <section class="section projects-section" id="projects" aria-labelledby="projects-title">
+        <div class="section-heading reveal">
+          <p class="section-index">03 / PROJECT SELECT</p>
+          <h2 id="projects-title">项目</h2>
+          <p>PROJECTS</p>
+        </div>
+
+        <div class="projects-intro reveal">
+          <p>从想法到实现，这里记录我在 GitHub 上的开发实践。</p>
+          <a class="projects-directory" data-projects-directory target="_blank" rel="noreferrer">浏览 GitHub 仓库 <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="projects-toolbar reveal">
+          <span>SELECTED REPOSITORIES</span>
+          <span data-projects-count>00 PROJECTS</span>
+        </div>
+        <div class="project-list" data-project-list aria-live="polite"></div>
+        <p class="projects-empty pixel-panel" data-projects-empty hidden>项目正在整理中，欢迎先到 GitHub 看看我的开发记录。</p>
+        <noscript><p class="projects-empty pixel-panel">开启 JavaScript 即可查看项目介绍，也可以通过个人信息中的 GitHub 链接浏览仓库。</p></noscript>
+      </section>
+
       <section class="section crosshair-section" id="crosshair" aria-labelledby="crosshair-title">
         <div class="section-heading section-heading--light reveal">
-          <p class="section-index">03 / AIM LAB</p>
+          <p class="section-index">04 / AIM LAB</p>
           <h2 id="crosshair-title">准星分享</h2>
           <p>CROSSHAIR</p>
         </div>
@@ -249,7 +270,7 @@
               <span class="data-label">SELECTED PRESET</span>
               <h3 id="crosshair-name">1322</h3>
               <dl>
-                <div><dt>颜色</dt><dd id="crosshair-color">青色</dd></div>
+                <div><dt>颜色</dt><dd id="crosshair-color">白色</dd></div>
                 <div><dt>轮廓</dt><dd id="crosshair-outline">关闭</dd></div>
                 <div><dt>中心点</dt><dd id="crosshair-center">关闭</dd></div>
               </dl>
@@ -268,7 +289,7 @@
 
       <section class="section github-section" id="github" aria-labelledby="github-title">
         <div class="section-heading reveal">
-          <p class="section-index">04 / DEV LOG</p>
+          <p class="section-index">05 / DEV LOG</p>
           <h2 id="github-title">GitHub 状态</h2>
           <p>GITHUB</p>
         </div>
@@ -311,7 +332,7 @@
 
       <section class="section activity-section" id="activity" aria-labelledby="activity-title">
         <div class="section-heading reveal">
-          <p class="section-index">05 / SIGNAL FEED</p>
+          <p class="section-index">06 / SIGNAL FEED</p>
           <h2 id="activity-title">最近动态</h2>
           <p>ACTIVITY</p>
         </div>
