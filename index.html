@@ -15,6 +15,7 @@
     <script src="js/config.js" defer></script>
     <script src="data/site-data.js" defer></script>
     <script src="js/main.js" defer></script>
+    <script src="js/visitors.js" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">跳到主要内容</a>
@@ -54,6 +55,7 @@
         <a href="#crosshair">04 准星</a>
         <a href="#github">05 GitHub</a>
         <a href="#activity">06 动态</a>
+        <a href="#visitors">07 访客</a>
       </nav>
 
       <div class="header-status" aria-label="网站状态">
@@ -110,8 +112,8 @@
 
       <div class="system-strip" aria-hidden="true">
         <div class="system-strip__track">
-          <span>PROFILE</span><i></i><span>GEAR</span><i></i><span>PROJECTS</span><i></i><span>CROSSHAIR</span><i></i><span>GITHUB</span><i></i><span>ACTIVITY</span><i></i>
-          <span>PROFILE</span><i></i><span>GEAR</span><i></i><span>PROJECTS</span><i></i><span>CROSSHAIR</span><i></i><span>GITHUB</span><i></i><span>ACTIVITY</span><i></i>
+          <span>PROFILE</span><i></i><span>GEAR</span><i></i><span>PROJECTS</span><i></i><span>CROSSHAIR</span><i></i><span>GITHUB</span><i></i><span>ACTIVITY</span><i></i><span>VISITORS</span><i></i>
+          <span>PROFILE</span><i></i><span>GEAR</span><i></i><span>PROJECTS</span><i></i><span>CROSSHAIR</span><i></i><span>GITHUB</span><i></i><span>ACTIVITY</span><i></i><span>VISITORS</span><i></i>
         </div>
       </div>
 
@@ -354,6 +356,54 @@
             <a class="feed-item__link" data-activity-link aria-label="打开网易云本周首位歌曲"><span data-activity-field="type">WEEKLY TOP</span><span aria-hidden="true">↗</span></a>
           </article>
         </div>
+      </section>
+      <section class="section visitors-section" id="visitors" aria-labelledby="visitors-title">
+        <div class="section-heading reveal">
+          <p class="section-index">07 / WORLD SIGNALS</p>
+          <h2 id="visitors-title">访客足迹</h2>
+          <p>VISITORS</p>
+        </div>
+        <div class="visitors-intro reveal">
+          <p>来自世界各处的访问，在这里点亮。</p>
+          <div class="visitors-periods" role="group" aria-label="统计时间范围">
+            <button type="button" data-visitor-days="7" aria-pressed="false">近 7 天</button>
+            <button type="button" data-visitor-days="30" aria-pressed="true">近 30 天</button>
+          </div>
+        </div>
+        <div class="visitors-console pixel-panel reveal">
+          <div class="visitors-metrics">
+            <div><span>访客数 · 估算</span><strong data-visitor-metric="visitors">--</strong><small>按 IP 与浏览器去重</small></div>
+            <div><span>访问次数</span><strong data-visitor-metric="pageviews">--</strong><small>PV / PAGE VIEWS</small></div>
+            <div><span>国家 / 地区</span><strong data-visitor-metric="countries">--</strong><small>按 IP 大致归属统计</small></div>
+          </div>
+          <div class="visitors-map-layout">
+            <div class="visitors-map-panel">
+              <div class="visitors-map-head"><span>GLOBAL VISITOR MAP</span><span data-visitor-connection>等待接入</span></div>
+              <div class="visitors-map" data-visitor-map>
+                <img class="visitors-map__land" src="assets/maps/world-land.svg" alt="" width="960" height="400" loading="lazy" decoding="async" />
+                <svg class="visitors-map__heat" viewBox="0 0 960 400" role="img" aria-labelledby="visitor-map-title visitor-map-desc">
+                  <title id="visitor-map-title">访客地理分布热力图</title>
+                  <desc id="visitor-map-desc">亮度越高表示该地区访问次数越多。IP 定位为大致位置，非实时位置。</desc>
+                  <defs><radialGradient id="visitor-heat-gradient"><stop offset="0%" stop-color="#b5fff6" stop-opacity=".95"/><stop offset="28%" stop-color="#72d9d0" stop-opacity=".8"/><stop offset="100%" stop-color="#72d9d0" stop-opacity="0"/></radialGradient></defs>
+                  <g data-visitor-points></g>
+                </svg>
+                <p class="visitors-map__message" data-visitor-message role="status">访客地图将在接入统计后点亮。</p>
+              </div>
+              <div class="visitors-map-legend"><span>访问次数</span><span>少</span><i></i><span>多</span><span data-visitor-updated></span></div>
+            </div>
+            <aside class="visitors-regions" aria-labelledby="visitor-regions-title">
+              <h3 id="visitor-regions-title">访问来源</h3>
+              <p class="visitors-regions__hint">按访问次数排序</p>
+              <ol data-visitor-regions></ol>
+              <p data-visitor-region-empty>尚无统计数据</p>
+            </aside>
+          </div>
+          <div class="visitors-footer">
+            <p>地图仅显示 IP 的大致地区与汇总数量，代理与移动网络可能影响位置和去重结果。尊重浏览器的 Do Not Track / GPC 设置。</p>
+            <button class="visitors-retry" type="button" data-visitor-retry hidden>重新加载</button>
+          </div>
+        </div>
+        <noscript><p>开启 JavaScript 后可查看访客分布。</p></noscript>
       </section>
     </main>
 

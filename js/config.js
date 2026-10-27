@@ -111,6 +111,11 @@ window.PLAYER_HOME_CONFIG = {
     },
   ],
 
+  visitors: {
+    // Public HTTPS endpoint of the visitor statistics Worker.
+    endpoint: "https://stats.salieri.site",
+  },
+
   activity: [
     { source: "bilibili", platform: "哔哩哔哩", time: "等待同步", title: "最新视频动态将在这里显示", summary: "标题、发布时间、封面和链接接入后自动更新。", type: "VIDEO" },
     { source: "weibo", platform: "微博", time: "等待同步", title: "最新微博将在这里显示", summary: "文字、图片与原始动态链接会汇总到这一条时间线。", type: "POST" },

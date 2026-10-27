@@ -18,6 +18,7 @@ python3 -m http.server 4173
 - 无畏契约准星预览与代码复制
 - GitHub 贡献日期图与活动列表
 - B站、微博、网易云音乐聚合动态
+- 访客统计与世界地图：近 7/30 天估算访客数、访问次数和地区热力分布
 
 B站最新投稿已通过后台 WBI 请求接入，展示封面、标题、简介、播放量、发布时间和原视频链接，无需在网页端配置 Cookie。
 
@@ -45,6 +46,10 @@ projects: [
 ```
 
 `repo` 使用 `所有者/仓库名` 格式，页面据此生成 GitHub 链接；`description` 是主要介绍，`highlights` 和 `tags` 可省略。项目介绍在本地静态渲染，无需浏览器调用 GitHub API；定时动态更新不会覆盖项目选择和介绍。列表为空时显示整理提示与 GitHub 仓库入口。
+
+## 访客统计
+
+访客地图使用独立的 Cloudflare Worker + D1 后台，主页仍部署到 GitHub Pages。地图位于最近动态之后，访问次数越多的地区越亮；只展示汇总地区，不公开完整 IP。需要先部署 [`analytics`](./analytics/README.md) 并把 Worker 地址填入 `js/config.js` 的 `visitors.endpoint`，接入后才开始记录真实访问。未接入时显示等待状态，不生成虚构访客数据。
 
 ## 本地自动更新
 

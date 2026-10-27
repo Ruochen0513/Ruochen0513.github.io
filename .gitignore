@@ -1,3 +1,7 @@
 automation/api-config.json
 automation/.env
 automation/*.log
+analytics/node_modules/
+analytics/.wrangler/
+analytics/.dev.vars
+analytics/.env*
