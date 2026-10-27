@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="referrer" content="no-referrer" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src https://stats.salieri.site; object-src 'none'; base-uri 'none'; form-action 'none'" />
+    <title>主页配置 / SALIERI_HOME</title>
+    <link rel="icon" type="image/png" href="../assets/images/logo-miku.png" />
+    <link rel="stylesheet" href="../css/styles.css" />
+    <link rel="stylesheet" href="config.css" />
+    <script src="../js/config.js" defer></script>
+    <script src="editor.mjs" type="module"></script>
+  </head>
+  <body class="config-page">
+    <header class="config-header">
+      <a class="config-wordmark" href="../">SALIERI<span>_HOME</span></a>
+      <span class="config-header__label">CONTENT CONTROL / 配置中心</span>
+      <a class="config-home-link" href="../" target="_blank" rel="noopener">查看主页 ↗</a>
+    </header>
+    <main class="config-shell">
+      <div class="config-notice" id="notice" role="status" aria-live="polite">正在连接配置服务…</div>
+      <section class="auth-card pixel-panel" id="auth-panel" hidden aria-labelledby="auth-title">
+        <p class="config-eyebrow">PRIVATE ACCESS</p>
+        <h1 id="auth-title">登录配置中心</h1>
+        <p id="auth-description">输入管理密码，编辑并发布你的主页内容。</p>
+        <form id="auth-form">
+          <label id="setup-code-label" hidden>一次性初始化码<input id="setup-code" type="password" autocomplete="off" maxlength="256" spellcheck="false" /></label>
+          <label><span id="password-label">管理密码</span><input id="password" type="password" autocomplete="current-password" required maxlength="128" /></label>
+          <label id="confirm-label" hidden>确认密码<input id="confirm-password" type="password" autocomplete="new-password" maxlength="128" /></label>
+          <p class="auth-hint" id="auth-hint">登录状态最多保留 8 小时。请使用自己的设备登录。</p>
+          <button class="pixel-button pixel-button--primary" id="auth-submit" type="submit">登录</button>
+        </form>
+      </section>
+      <div id="editor-panel" hidden>
+        <div class="config-intro"><div><p class="config-eyebrow">YOUR SPACE, YOUR WORDS</p><h1>编辑你的主页</h1><p>从日常的一句话，到下一个新项目。</p></div><button class="config-quiet-button" id="logout" type="button">退出登录</button></div>
+        <div class="editor-layout">
+          <nav class="editor-nav" aria-label="配置分类">
+            <a href="#edit-profile">01 个人资料</a><a href="#edit-overview">02 首页概览</a><a href="#edit-socials">03 社交链接</a><a href="#edit-gear">04 桌面外设</a><a href="#edit-projects">05 项目展示</a><a href="#edit-crosshairs">06 准星分享</a><a href="#edit-sections">07 栏目显示</a><a href="#edit-account">08 账号与备份</a>
+          </nav>
+          <div class="editor-main">
+            <form id="editor-form">
+              <section class="editor-section pixel-panel" id="edit-profile"><div class="editor-heading"><span>01 / PROFILE</span><h2>个人资料</h2><p>这些文字会显示在首页介绍、个人档案和页脚中。</p></div><div class="editor-fields" id="profile-fields"></div></section>
+              <section class="editor-section pixel-panel" id="edit-overview"><div class="editor-heading"><span>02 / AT A GLANCE</span><h2>首页概览</h2><p>首页的三组简短标签，适合写所在地、状态和关注方向。</p></div><div id="overview-fields"></div></section>
+              <section class="editor-section pixel-panel" id="edit-socials"><div class="editor-heading"><span>03 / CHANNELS</span><h2>社交链接</h2><p>填写完整的 HTTPS 地址；留空链接即可取消绑定。</p></div><div id="social-fields"></div></section>
+              <section class="editor-section pixel-panel" id="edit-gear"><div class="editor-heading"><span>04 / LOADOUT</span><h2>桌面外设</h2><p>更新设备型号，以及 DPI、轴体、尺寸等参数。</p></div><div id="gear-fields"></div></section>
+              <section class="editor-section pixel-panel" id="edit-projects"><div class="editor-heading"><span>05 / PROJECT SELECT</span><h2>项目展示</h2><p>最多 20 个项目，可新增、删除或调整顺序。仓库填写 owner/repository。</p></div><div id="project-fields"></div><button class="config-quiet-button" id="add-project" type="button">＋ 添加项目</button><p class="editor-note" id="projects-empty" hidden>暂未展示项目。添加一个，让大家看看你在做什么。</p></section>
+              <section class="editor-section pixel-panel" id="edit-crosshairs"><div class="editor-heading"><span>06 / AIM LAB</span><h2>准星分享</h2><p>编辑现有三种准星的名称、说明、预览颜色和分享代码。预览形状沿用当前样式。</p></div><div id="crosshair-fields"></div></section>
+              <section class="editor-section pixel-panel" id="edit-sections"><div class="editor-heading"><span>07 / VISIBILITY</span><h2>栏目显示</h2><p>关闭后，主页会隐藏对应栏目及导航入口。</p></div><div class="section-toggles" id="section-fields"></div></section>
+            </form>
+            <section class="editor-section pixel-panel" id="edit-account"><div class="editor-heading"><span>08 / YOUR ACCOUNT</span><h2>账号与备份</h2><p>备份包含公开主页内容，不包含密码或登录凭证。</p></div>
+              <div class="backup-actions"><button class="config-quiet-button" id="export-config" type="button">导出当前草稿</button><label class="config-quiet-button import-button">导入配置文件<input id="import-config" type="file" accept=".json,application/json" /></label><button class="config-quiet-button" id="restore-defaults" type="button">将默认内容载入草稿</button></div>
+              <p class="editor-note">导入和载入默认内容只修改草稿，点击“保存并发布”后才会改变主页。GitHub 状态和社交动态继续自动同步；图片资源仍使用当前素材。</p>
+              <details class="password-details"><summary>修改管理密码</summary><form id="password-form"><div class="editor-fields"><label>当前密码<input name="currentPassword" type="password" autocomplete="current-password" required maxlength="128" /></label><label>新密码<input name="newPassword" type="password" autocomplete="new-password" required minlength="12" maxlength="128" /></label><label>确认新密码<input name="confirmPassword" type="password" autocomplete="new-password" required minlength="12" maxlength="128" /></label></div><button class="config-quiet-button" type="submit">更新密码</button><p class="editor-note">需要 12–128 个字符，建议使用密码管理器生成。更新后其他设备的登录状态会失效。</p></form></details>
+            </section>
+          </div>
+        </div>
+        <footer class="editor-savebar"><div><strong id="save-state">内容已同步</strong><span id="save-version"></span></div><div><button class="config-quiet-button" id="reload-config" type="button">重新载入</button><button class="pixel-button pixel-button--primary" id="save-config" type="submit" form="editor-form">保存并发布 ↗</button></div></footer>
+      </div>
+      <noscript><p>请开启 JavaScript 后使用配置中心。</p></noscript>
+    </main>
+  </body>
+</html>

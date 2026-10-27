@@ -1,3 +1,6 @@
+(async () => {
+await window.PLAYER_HOME_CONFIG_READY;
+
 const mergeConfig = (base, override) => {
   if (!override || typeof override !== "object") return base;
   const output = Array.isArray(base) ? [...base] : { ...base };
@@ -14,6 +17,11 @@ const mergeConfig = (base, override) => {
 
 const liveData = window.PLAYER_HOME_LIVE_DATA || {};
 const config = mergeConfig(window.PLAYER_HOME_CONFIG, liveData);
+Object.entries(config.sections || {}).forEach(([id, visible]) => {
+  const section = document.getElementById(id);
+  if (section) section.hidden = !visible;
+  document.querySelectorAll(`a[href="#${id}"]`).forEach(link => { link.hidden = !visible; });
+});
 if (liveData.activity?.length) {
   const liveSources = new Set(liveData.activity.map((item) => item.source));
   config.activity = [
@@ -90,7 +98,7 @@ document.querySelectorAll("[data-commit]").forEach((row) => {
   setText(row.querySelector("time"), item.time);
 });
 
-// Project selections and editorial copy are always controlled by config.js.
+// Project selections use saved editorial config, independently of scheduled data.
 // Scheduled activity updates must not replace the selected repositories.
 const projectList = document.querySelector("[data-project-list]");
 const projects = (window.PLAYER_HOME_CONFIG.projects || []).filter((project) =>
@@ -216,9 +224,11 @@ const navLinks = [...document.querySelectorAll(".site-nav a")];
 const revealItems = document.querySelectorAll(".reveal");
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-window.addEventListener("load", () => {
+const finishBoot = () => {
   window.setTimeout(() => bootScreen?.classList.add("is-hidden"), reduceMotion ? 0 : 750);
-});
+};
+if (document.readyState === "complete") finishBoot();
+else window.addEventListener("load", finishBoot, { once: true });
 
 menuButton?.addEventListener("click", () => {
   const isOpen = menuButton.getAttribute("aria-expanded") === "true";
@@ -327,3 +337,4 @@ document.querySelectorAll("a[aria-disabled='true']").forEach((link) => {
 
 setText(document.querySelector("[data-current-year]"), String(new Date().getFullYear()));
 setText(document.querySelector(".footer-copy"), `© ${new Date().getFullYear()} ${config.profile.footerName}`);
+})();

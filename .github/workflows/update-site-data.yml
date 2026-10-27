@@ -31,7 +31,10 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
+
+      - name: Test visitor and admin APIs
+        run: node --test analytics/*.test.mjs
 
       - name: Test data adapters
         run: node --test automation/update-site-data.test.mjs

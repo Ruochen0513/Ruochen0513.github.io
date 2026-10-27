@@ -1,3 +1,5 @@
+import { admin, publicConfig, cleanupAdmin } from './admin.mjs';
+
 const DAY = 86_400_000;
 const BOT = /bot\b|crawler|spider|slurp|preview|facebookexternalhit|monitor|uptime|curl\//i;
 
@@ -71,6 +73,9 @@ export async function stats(env, days = 30, now = Date.now()) {
 
 export default {
   async fetch(request, env) {
+    const path = new URL(request.url).pathname;
+    if (path.startsWith('/admin/')) return admin(request, env);
+    if (path === '/site-config') return publicConfig(request, env);
     const origin = request.headers.get('Origin') || '';
     const allowed = (env.ALLOWED_ORIGINS || '').split(',').map(value => value.trim()).filter(Boolean);
     if (!origin || !allowed.includes(origin)) return reply({ error: 'origin_not_allowed' }, 403, 'null');
@@ -96,5 +101,6 @@ export default {
   async scheduled(_event, env) {
     const cutoff = new Date(Date.now() - 90 * DAY).toISOString().slice(0, 10);
     await env.DB.prepare('DELETE FROM visits WHERE day < ?').bind(cutoff).run();
+    await cleanupAdmin(env);
   },
 };

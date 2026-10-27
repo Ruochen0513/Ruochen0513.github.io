@@ -28,7 +28,25 @@ After deployment set `visitors.endpoint` in `../js/config.js` to the Worker HTTP
 
 No database data or credentials go into the GitHub repository. `wrangler.jsonc` contains public configuration only. Production accepts only the three explicit origins in `ALLOWED_ORIGINS`; a local preview is intentionally not counted. Add a localhost origin only to a separate development deployment if needed.
 
-## What is counted
+## Homepage configuration editor
+
+`https://salieri.site/config/` is the password-protected content editor. GitHub Pages serves its static interface; the same Worker verifies credentials and stores public content in D1. The hostname `/config` redirects to `/config/` through GitHub Pages directory routing. No GitHub write token is needed. Saving updates the public `/site-config` JSON immediately; the next homepage load reads it. An unavailable service falls back to the checked-in `js/config.js` content after a short timeout.
+
+Apply all migrations and deploy the Worker before publishing the frontend. To provision the first login with your own Wrangler account:
+
+```bash
+node create-setup-code.mjs
+```
+
+Open the configuration page and enter the one-time code, then choose a 12–128 character password. Codes expire after 24 hours and are consumed by an atomic database update. The helper refuses to overwrite a configured password. The password and code are never stored in the repository or browser storage. Passwords use salted PBKDF2-SHA256 (100,000 iterations); sessions use random tokens stored only as hashes, an HttpOnly/Secure/SameSite=Strict host cookie, CSRF tokens, and an 8-hour expiry. Login/setup attempts are limited to 8 per keyed IP bucket per 15 minutes. Only the main site's two exact origins can access admin routes; GitHub Pages' alternate github.io origin can read public content but cannot log in. No credentials/request bodies are logged.
+
+For password recovery, the owner with Cloudflare account access can run `node create-setup-code.mjs --reset-password`. This explicitly clears the old password, revokes all sessions, and issues a new initialization code. Running without this flag only provisions an account that has no password yet. Do not publish the generated code in issues, commits, or screenshots.
+
+Editable content includes profile/overview text, the five social links, four gear cards, the three existing crosshair presets, up to 20 projects with descriptions/highlights/tags and ordering, and section visibility. The editor supports JSON export/import and loading checked-in defaults into a draft; neither operation publishes until Save is clicked. Images and automated GitHub/social feed settings remain deployment configuration. Public content is validated against a shared allowlist; API endpoints and backend settings cannot be changed through it. Optimistic revision checks prevent one browser tab from silently overwriting another tab's saved changes. A hidden visitor section changes display only; visitor collection remains enabled.
+
+Configuration changes are stored in D1 independently of GitHub commits. Export a backup from the editor when needed. Database access remains private to Cloudflare; `/site-config` only exposes approved public content, not credentials, sessions, or visitor identities.
+
+## Visitor counting
 
 - A view is one accepted `/visit` request. Reloads from the same IP/browser within 10 seconds are suppressed.
 - Visitors are distinct HMAC-SHA256 identifiers derived from IP + User-Agent using a server-only secret, deduplicated across the selected 7/30-day period. This is an estimate, not a count of physical people. NAT/proxies, browser changes, IP changes, and privacy settings affect it.
@@ -64,6 +82,7 @@ Each point contains `country`, `latitude`, `longitude`, `views`, and `visitors`.
 
 ```bash
 node worker.test.mjs
+node admin.test.mjs
 npx wrangler deploy --dry-run
 ```
 

@@ -7,6 +7,7 @@ import worker, { collect, stats, visitorId, location } from './worker.mjs';
 function database() {
   const sqlite = new DatabaseSync(':memory:');
   sqlite.exec(readFileSync(new URL('./migrations/0001_visits.sql', import.meta.url), 'utf8'));
+  sqlite.exec(readFileSync(new URL('./migrations/0002_site_config.sql', import.meta.url), 'utf8'));
   const prepare = sql => {
     let values = [];
     const statement = {

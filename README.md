@@ -51,6 +51,10 @@ projects: [
 
 访客地图使用独立的 Cloudflare Worker + D1 后台，主页仍部署到 GitHub Pages。地图位于最近动态之后，访问次数越多的地区越亮；只展示汇总地区，不公开完整 IP。需要先部署 [`analytics`](./analytics/README.md) 并把 Worker 地址填入 `js/config.js` 的 `visitors.endpoint`，接入后才开始记录真实访问。未接入时显示等待状态，不生成虚构访客数据。
 
+## 网页配置中心
+
+访问 `/config/`，设置管理密码并登录后，可编辑个人资料、首页概览、社交链接、外设、项目介绍与排序、准星文字与颜色，以及栏目显示。点击“保存并发布”后刷新主页即可生效，无需修改代码或重新部署。支持配置导出、导入和将默认内容载入草稿。初始化与密码找回方式见 [`analytics/README.md`](./analytics/README.md#homepage-configuration-editor)。配置保存在 Cloudflare D1；密码和登录凭证不会写入公开仓库。
+
 ## 本地自动更新
 
 项目已经包含可运行的本地定时更新系统：
