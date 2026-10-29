@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="所有访客共用一盘国际象棋，每次走一步，交给下一位访客。支持标准规则、棋谱回放和历史对局。" />
+    <meta name="referrer" content="no-referrer" />
+    <title>国际象棋对战 / SALIERI_HOME</title>
+    <link rel="icon" href="../assets/images/logo-miku.png" />
+    <link rel="stylesheet" href="../css/styles.css" />
+    <link rel="stylesheet" href="chess.css" />
+    <script src="../js/config.js" defer></script>
+    <script src="app.mjs" type="module"></script>
+  </head>
+  <body class="chess-page">
+    <header class="chess-header"><a class="chess-brand" href="../">SALIERI<span>_HOME</span></a><span class="chess-header__label">COMMUNITY CHESS</span><nav aria-label="棋局导航"><a href="#history-panel">历史对局</a><a href="../">返回主页 ↗</a></nav></header>
+    <main class="chess-shell">
+      <div class="chess-intro"><div><p class="chess-eyebrow">ONE MOVE. MANY MINDS.</p><h1>访客接力棋局<span>国际象棋对战</span></h1><p>不必同时在线。每次走一步，交给下一位访客。</p></div><div class="chess-badges"><span>异步接力</span><span>标准规则</span><span>无计时</span></div></div>
+      <div class="chess-notice" id="chess-notice" role="status" aria-live="polite">正在连接共享棋局…</div>
+      <div class="chess-layout">
+        <section class="chess-arena" aria-label="棋盘与走棋操作">
+          <div class="chess-player-bar"><span class="side-dot side-dot--black"></span><div><strong id="top-side">黑方</strong><span>所有访客共同参与</span></div><span class="side-turn" id="top-turn"></span></div>
+          <div class="board-frame"><div class="chess-board" id="chess-board" role="group" aria-label="国际象棋棋盘" aria-busy="true"></div></div>
+          <div class="chess-player-bar"><span class="side-dot side-dot--white"></span><div><strong id="bottom-side">白方</strong><span>所有访客共同参与</span></div><span class="side-turn" id="bottom-turn"></span></div>
+          <div class="board-toolbar"><button type="button" id="flip-board">⇅ 翻转棋盘</button><button type="button" id="sync-game">↻ 同步棋局</button><span id="last-sync"></span></div>
+          <div class="chess-participation pixel-panel"><div><span class="chess-eyebrow">YOUR NEXT MOVE</span><h2 id="participation-title">等待棋局</h2><p id="participation-note">加载后，点击己方棋子查看合法落点。</p></div><button class="pixel-button pixel-button--primary" id="new-game" type="button" hidden>开启下一局 ↗</button><button class="chess-secondary" id="claim-draw" type="button" hidden>声明和棋</button></div>
+          <details class="chess-rules"><summary>接力规则与和棋说明</summary><p>所有访客共用一盘棋，白方先行，之后黑白交替。同一 IP 不能连续落子，等其他 IP 落子后可再次参与；同一网络下的不同设备可能共用 IP。服务端使用 IP 的加密标识执行限制，不公开完整 IP。</p><p>支持将军、将死、逼和、王车易位、吃过路兵和升变为后／车／象／马。三次重复或 50 回合无吃子、无兵移动时，轮到的一方可以声明和棋；五次重复或 75 回合时自动和棋，将死优先。没有棋钟，不会因离线超时判负。</p><p>棋谱中的每一着都可点击回放。回看期间不能落子；点击“回到当前棋局”即可继续。结束的棋局会自动存入历史，也可以下载 PGN。</p><p class="rules-credit">规则引擎 <a href="https://github.com/jhlywa/chess.js" target="_blank" rel="noreferrer">chess.js</a> · <a href="../assets/vendor/chess/LICENSE" target="_blank" rel="noreferrer">BSD-2-Clause</a></p></details>
+        </section>
+        <aside class="chess-sidebar" aria-label="棋谱与历史">
+          <section class="score-panel pixel-panel" aria-labelledby="score-title"><div class="score-heading"><div><p class="chess-eyebrow">LIVE SCORESHEET</p><h2 id="score-title">第 — 局</h2></div><span class="game-result" id="game-result">连接中</span></div><div class="score-meta"><span id="score-position">初始局面</span><button type="button" id="return-live" hidden>回到当前棋局 ↗</button></div><div class="move-table-head" aria-hidden="true"><span>#</span><span>白方</span><span>黑方</span></div><div class="move-list" id="move-list" aria-label="走棋记录"><p class="chess-empty">棋谱将在这里记录每一步。</p></div><div class="history-controls" role="group" aria-label="棋谱回放控制"><button type="button" id="first-move" aria-label="初始局面" disabled>⏮</button><button type="button" id="previous-move" aria-label="上一步" disabled>◀</button><span id="move-counter">0 / 0</span><button type="button" id="next-move" aria-label="下一步" disabled>▶</button><button type="button" id="last-move" aria-label="最后一步" disabled>⏭</button></div><div class="score-footer"><span id="game-ending"></span><button type="button" id="download-pgn" disabled>下载 PGN ↓</button></div></section>
+          <section class="archive-panel pixel-panel" id="history-panel" aria-labelledby="history-title"><div class="archive-heading"><div><p class="chess-eyebrow">THE ARCHIVE</p><h2 id="history-title">历史对局</h2></div><button type="button" id="refresh-history" aria-label="刷新历史对局">↻</button></div><div id="archive-list"><p class="chess-empty">正在读取历史…</p></div><button class="archive-more" type="button" id="more-history" hidden>加载更早的对局</button></section>
+        </aside>
+      </div>
+    </main>
+    <dialog class="chess-dialog" id="promotion-dialog" aria-labelledby="promotion-title"><h2 id="promotion-title">选择升变棋子</h2><p>兵已抵达底线，请选择后、车、象或马。</p><div class="promotion-options" id="promotion-options"></div><button class="chess-secondary" type="button" id="cancel-promotion">取消</button></dialog>
+    <dialog class="chess-dialog" id="draw-dialog" aria-labelledby="draw-title"><h2 id="draw-title">这一步可以声明和棋</h2><p id="draw-description"></p><div class="draw-actions"><button type="button" class="pixel-button pixel-button--primary" id="declare-draw">声明和棋</button><button type="button" class="chess-secondary" id="play-instead">正常落子</button><button type="button" class="chess-secondary" id="cancel-draw">取消</button></div></dialog>
+    <noscript><p class="chess-shell">开启 JavaScript 后可以查看棋盘、参与接力和回放棋谱。</p></noscript>
+  </body>
+</html>

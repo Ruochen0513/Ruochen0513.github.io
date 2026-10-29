@@ -1,4 +1,5 @@
 import { admin, publicConfig, cleanupAdmin } from './admin.mjs';
+import { communityChess, cleanupChess } from './chess.mjs';
 
 const DAY = 86_400_000;
 const BOT = /bot\b|crawler|spider|slurp|preview|facebookexternalhit|monitor|uptime|curl\//i;
@@ -74,6 +75,7 @@ export async function stats(env, days = 30, now = Date.now()) {
 export default {
   async fetch(request, env) {
     const path = new URL(request.url).pathname;
+    if (path.startsWith('/chess/')) return communityChess(request, env);
     if (path.startsWith('/admin/')) return admin(request, env);
     if (path === '/site-config') return publicConfig(request, env);
     const origin = request.headers.get('Origin') || '';
@@ -102,5 +104,6 @@ export default {
     const cutoff = new Date(Date.now() - 90 * DAY).toISOString().slice(0, 10);
     await env.DB.prepare('DELETE FROM visits WHERE day < ?').bind(cutoff).run();
     await cleanupAdmin(env);
+    await cleanupChess(env);
   },
 };

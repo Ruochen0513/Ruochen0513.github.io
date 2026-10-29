@@ -59,7 +59,28 @@ Configuration changes are stored in D1 independently of GitHub commits. Export a
 
 Origin allowlisting prevents unrelated browser origins from writing, but is not authentication: a non-browser client can spoof Origin/User-Agent. This is a lightweight personal-site counter, not billing-grade or fraud-resistant analytics. For abuse at scale add Cloudflare WAF/rate limiting/Turnstile as appropriate, and monitor the account's resource usage.
 
-## API
+## Community chess
+
+`/chess/` is an independent GitHub Pages page linked from the main navigation. It shares one asynchronous, untimed standard chess game among visitors. Each accepted move switches the side to move; the last contributing IP cannot move again until another IP contributes. Eligibility is computed on the server using only Cloudflare's trusted `CF-Connecting-IP` and a domain-separated HMAC-SHA256 keyed by `VISITOR_SECRET`, independent of cookies, User-Agent or client-submitted identity. Raw addresses and private hashes are never returned. Shared NAT connections share eligibility; changing IP/proxy can bypass an IP-based identity, so this is a community game rather than an authenticated anti-cheating system.
+
+The same vendored chess.js 1.4.0 module is used on the server and browser. Only the server can accept moves. Castling, en passant, check, checkmate, stalemate and all four promotions are validated. Insufficient-material detection uses chess.js. Threefold repetition and 50-move situations require a claim; fivefold repetition and 75-move situations are automatic draws, with checkmate taking precedence. Claims about an intended move validate that move without executing or recording it, as in FIDE articles 9.2/9.3. No clocks, resignation or one-sided abort are offered in this shared setting.
+
+Migration `0003_community_chess.sql` creates an initial empty game. Each move and its FEN/SAN are stored separately. D1 batch transactions atomically update the game with a revision check and append the matching scoresheet entry. An internal per-request nonce prevents a rejected concurrent request from inserting a move into another request's committed position. Reads cap moves at the captured revision's ply, preventing newer moves from leaking into older metadata snapshots. A partial unique index permits only one active game. Finished games are immutable through the API and are not removed by the daily visitor-data cleanup. A new game can only be created after the latest game finishes.
+
+All endpoints use the existing allowed-origin list and require no login:
+
+- `GET /chess/current`: current/latest game and viewer eligibility. `known=id.revision&after=ply` returns a small unchanged response or only newly added moves.
+- `GET /chess/games/:id`: full game for replay, including finished games.
+- `GET /chess/history?before=id`: up to 12 finished games per page, plus `nextCursor`.
+- `POST /chess/move`: `{gameId, revision, from, to, promotion?}`; a missing promotion is rejected. Add `claim: true` to claim a draw based on the intended move instead of executing it.
+- `POST /chess/claim`: `{gameId, revision}` claims an already-repeated/50-move position on the current turn.
+- `POST /chess/new`: `{gameId, revision}` opens the next game only if that latest game has finished.
+
+Writes are limited to 20 attempts per hashed IP per minute and bodies to 2 KB. The browser polls every 30 seconds only while visible, following the current game, and not choosing a promotion/draw or submitting a move. History replay pauses polling and is read-only. PGN export is generated from public SAN records. Production never accepts test identities, arbitrary FENs, custom starting positions or fixture-reset requests. Browser QA uses an isolated local in-memory database and never populates the real game with test moves.
+
+Rules reference: https://handbook.fide.com/chapter/E012023 . Engine provenance/license: `../assets/vendor/chess/SOURCE.md` and `LICENSE`. Board piece SVG geometry is original code in `../chess/pieces.mjs`.
+
+## Visitor API
 
 `POST /visit` (empty body) returns 204. The Worker reads IP and location from Cloudflare, not a submitted body. Requests need an allowed `Origin` header. Browser credentials/cookies are not used.
 
@@ -83,6 +104,7 @@ Each point contains `country`, `latitude`, `longitude`, `views`, and `visitors`.
 ```bash
 node worker.test.mjs
 node admin.test.mjs
+node chess.test.mjs
 npx wrangler deploy --dry-run
 ```
 

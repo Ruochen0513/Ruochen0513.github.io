@@ -13,7 +13,7 @@ const bootstrap = 'test-only-initialization-code-with-enough-entropy';
 const origin = 'https://salieri.site';
 function database() {
   const sqlite = new DatabaseSync(':memory:');
-  for (const file of ['0001_visits.sql', '0002_site_config.sql']) sqlite.exec(readFileSync(new URL(`./migrations/${file}`, import.meta.url), 'utf8'));
+  for (const file of ['0001_visits.sql', '0002_site_config.sql', '0003_community_chess.sql']) sqlite.exec(readFileSync(new URL(`./migrations/${file}`, import.meta.url), 'utf8'));
   const prepare = sql => {
     let values = [];
     const statement = {

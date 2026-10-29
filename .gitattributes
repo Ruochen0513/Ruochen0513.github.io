@@ -1,0 +1,2 @@
+# Preserve the official generated engine's upstream indentation and final newline.
+assets/vendor/chess/chess.mjs whitespace=-space-before-tab,-blank-at-eof
