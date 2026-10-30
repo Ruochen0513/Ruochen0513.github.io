@@ -25,7 +25,7 @@
 .side-dot--black { background: #292130; }.side-dot--white { background: #f1e8d8; border-color: #fff7e8; }
 .side-turn { margin-left: auto; color: var(--cyan); font-size: 10px; }
 .board-frame { padding: 9px; background: #221b2d; border: 1px solid #544165; box-shadow: 8px 8px 0 #79619d0f; }
-.chess-board { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); width: 100%; aspect-ratio: 1; touch-action: manipulation; }
+.chess-board { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); width: 100%; aspect-ratio: 1; touch-action: none; }
 .chess-square { display: grid; position: relative; place-items: center; min-width: 0; padding: 0; border: 0; border-radius: 0; cursor: pointer; aspect-ratio: 1; -webkit-user-select: none; user-select: none; }
 .chess-square.light { background: #c3b7cf; color: #554366; }.chess-square.dark { background: #746187; color: #e0d2eb; }
 .chess-square.last-move::before, .chess-square.is-selected::before, .chess-square.in-check::before { position: absolute; inset: 0; content: ''; background: #e3cf5e55; }
@@ -39,6 +39,12 @@
 .coordinate-rank { top: 5px; left: 5px; }.coordinate-file { right: 5px; bottom: 5px; }
 .chess-piece { position: relative; z-index: 1; width: 91%; height: 91%; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.9; pointer-events: none; filter: drop-shadow(0 2px 1px #0004); }
 .chess-piece--w { fill: #fff3d9; stroke: #40313f; }.chess-piece--b { fill: #282330; stroke: #c9bbd8; }
+.chess-square.is-draggable { cursor: grab; }
+.chess-board.is-dragging .chess-square, .chess-dragging { cursor: grabbing; }
+.chess-square.is-drag-source > .chess-piece { opacity: .18; }
+.chess-square.drag-over { box-shadow: inset 0 0 0 3px #52ffe0; }
+.chess-square.drag-invalid { box-shadow: inset 0 0 0 3px #df6887; }
+.chess-drag-ghost { position: fixed; z-index: 1000; display: grid; place-items: center; transform: translate(-50%, -50%); pointer-events: none; user-select: none; }
 .board-toolbar { display: flex; align-items: center; gap: 18px; padding: 12px 0 22px; }
 .board-toolbar button, .score-meta button, .score-footer button, .archive-heading > button { padding: 5px 0; border: 0; background: none; color: var(--lavender); cursor: pointer; font-size: 11px; }
 .board-toolbar > span { margin-left: auto; color: var(--dim); font-size: 9px; }

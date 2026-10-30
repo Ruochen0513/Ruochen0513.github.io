@@ -15,6 +15,8 @@ let historySequence = 0;
 let archiveCursor = null;
 let archiveGames = [];
 let pendingMove = null;
+let pointerDrag = null;
+let suppressBoardClickUntil = 0;
 const colorName = side => side === 'w' ? '白方' : '黑方';
 const resultName = value => ({ '*': '进行中', '1-0': '白方胜', '0-1': '黑方胜', '1/2-1/2': '和棋' })[value] || value;
 function notify(message, kind = '') { $('#chess-notice').textContent = message; $('#chess-notice').dataset.kind = kind; }
@@ -44,7 +46,24 @@ const atLivePosition = () => !archiveView && viewPly === null;
 const canPlay = () => game && atLivePosition() && game.status === 'active' && game.canMove && !busy && !stale;
 const shownPly = () => viewPly === null ? game?.ply || 0 : viewPly;
 const shownFen = () => !game ? INITIAL_FEN : shownPly() === 0 ? game.initialFen : game.moves[shownPly() - 1].fen;
-function clearSelection() { selected = null; legal = []; }
+function stopDrag() {
+  const drag = pointerDrag;
+  pointerDrag = null;
+  if (!drag) return null;
+  drag.ghost?.remove();
+  const board = $('#chess-board');
+  board.classList.remove('is-dragging');
+  document.body.classList.remove('chess-dragging');
+  board.querySelectorAll('.is-drag-source, .drag-over, .drag-invalid').forEach(square => square.classList.remove('is-drag-source', 'drag-over', 'drag-invalid'));
+  if (board.hasPointerCapture(drag.id)) board.releasePointerCapture(drag.id);
+  if (drag.active) suppressBoardClickUntil = performance.now() + 400;
+  return drag;
+}
+function clearSelection() { stopDrag(); selected = null; legal = []; }
+function cancelDrag() {
+  const drag = stopDrag();
+  if (drag?.active) { clearSelection(); renderBoard(); }
+}
 function closeChoices() {
   pendingMove = null;
   for (const id of ['promotion-dialog', 'draw-dialog']) if ($(`#${id}`).open) $(`#${id}`).close();
@@ -75,6 +94,7 @@ function renderBoard() {
     if (target) button.classList.add('legal');
     if (piece) {
       button.classList.add('has-piece');
+      if (canPlay() && piece.color === game.turn) button.classList.add('is-draggable');
       if (piece.type === 'k' && piece.color === chess.turn() && chess.isCheck()) button.classList.add('in-check');
       button.append(pieceIcon(piece.color, piece.type));
     }
@@ -138,7 +158,7 @@ function renderStatus() {
   else if (stale) { title = '等待重新连接'; note = '请同步棋局后再落子，已加载的棋谱仍可回看。'; }
   else if (busy) { title = '正在提交落子…'; note = '以服务器确认的棋局为准。'; }
   else if (game.waitingForOtherIp) { title = '已完成这一手，等待接力'; note = `现在轮到${colorName(game.turn)}。其他 IP 的访客落子后，你可以再次参与。`; }
-  else if (game.canMove) { title = `轮到${colorName(game.turn)}，你可以走一步`; note = game.inCheck ? '当前正被将军，需要先解除将军。' : '点击己方棋子，再点击标记的合法落点。'; }
+  else if (game.canMove) { title = `轮到${colorName(game.turn)}，你可以走一步`; note = game.inCheck ? '当前正被将军，需要先解除将军。' : '拖动己方棋子到合法落点，也可以依次点击棋子和落点。'; }
   else { title = '当前无法参与走棋'; note = '可以查看棋谱，请稍后同步重试。'; }
   $('#participation-title').textContent = title; $('#participation-note').textContent = note;
 }
@@ -218,6 +238,63 @@ function chooseSquare(square) {
     notify(selected ? `${colorName(piece.color)}${PIECE_NAMES[piece.type]} ${square}：${legal.length ? '请选择标记的合法落点。' : '当前没有合法走法。'}` : '已取消选择。');
   } else if (selected) notify('这一步不合法，请选择标记的落点，或选择其他己方棋子。');
 }
+function boardSquareAt(x, y) {
+  const square = document.elementFromPoint(x, y)?.closest('[data-square]');
+  return square && $('#chess-board').contains(square) ? square : null;
+}
+function startPointer(event) {
+  if (pointerDrag || !event.isPrimary || event.button !== 0 || !canPlay() || pendingMove) return;
+  const square = event.target.closest('[data-square]');
+  if (!square) return;
+  const piece = new Chess(game.fen).get(square.dataset.square);
+  if (piece?.color !== game.turn) return;
+  pointerDrag = { id: event.pointerId, from: square.dataset.square, piece, gameId: game.id, revision: game.revision,
+    x: event.clientX, y: event.clientY, size: square.getBoundingClientRect().width, active: false, ghost: null };
+}
+function movePointer(event) {
+  const drag = pointerDrag;
+  if (!drag || drag.id !== event.pointerId) return;
+  if (!canPlay() || game.id !== drag.gameId || game.revision !== drag.revision) { cancelDrag(); return; }
+  if (!drag.active) {
+    if (Math.hypot(event.clientX - drag.x, event.clientY - drag.y) < 6) return;
+    drag.active = true;
+    selected = drag.from;
+    legal = new Chess(game.fen).moves({ square: drag.from, verbose: true });
+    renderBoard();
+    const board = $('#chess-board');
+    board.setPointerCapture(drag.id);
+    board.classList.add('is-dragging');
+    board.querySelector(`[data-square="${drag.from}"]`).classList.add('is-drag-source');
+    document.body.classList.add('chess-dragging');
+    const ghost = document.createElement('div');
+    ghost.className = 'chess-drag-ghost';
+    ghost.setAttribute('aria-hidden', 'true');
+    ghost.style.width = `${drag.size}px`; ghost.style.height = `${drag.size}px`;
+    ghost.append(pieceIcon(drag.piece.color, drag.piece.type));
+    document.body.append(ghost); drag.ghost = ghost;
+  }
+  event.preventDefault();
+  drag.ghost.style.left = `${event.clientX}px`; drag.ghost.style.top = `${event.clientY}px`;
+  const board = $('#chess-board');
+  board.querySelectorAll('.drag-over, .drag-invalid').forEach(square => square.classList.remove('drag-over', 'drag-invalid'));
+  const target = boardSquareAt(event.clientX, event.clientY);
+  if (target && target.dataset.square !== drag.from) target.classList.add(legal.some(move => move.to === target.dataset.square) ? 'drag-over' : 'drag-invalid');
+}
+function endPointer(event) {
+  if (!pointerDrag || pointerDrag.id !== event.pointerId) return;
+  const target = boardSquareAt(event.clientX, event.clientY);
+  const drag = stopDrag();
+  if (!drag.active) return; // A tap or a small mouse movement keeps the normal click behavior.
+  event.preventDefault();
+  if (!canPlay() || game.id !== drag.gameId || game.revision !== drag.revision) {
+    clearSelection(); renderBoard(); return;
+  }
+  if (target && target.dataset.square !== drag.from && legal.some(move => move.to === target.dataset.square)) chooseSquare(target.dataset.square);
+  else {
+    clearSelection(); renderBoard();
+    notify(target && target.dataset.square !== drag.from ? '落点不合法，棋子已归位。请选择标记的合法落点。' : '已取消拖动，没有落子。');
+  }
+}
 function considerMove(candidate) {
   if (!game || candidate.gameId !== game.id || candidate.revision !== game.revision) { notify('棋局已改变，请重新同步后选择走法。', 'error'); return; }
   const chess = new Chess(game.fen); const move = chess.move(candidate);
@@ -289,7 +366,16 @@ async function viewGame(id) {
     notify(`正在回看第 ${game.id} 局，点击棋谱即可跳转到对应局面。`);
   } catch (error) { if (sequence === loadSequence) notify(error.message, 'error'); }
 }
-$('#chess-board').addEventListener('click', event => { const button = event.target.closest('[data-square]'); if (button) chooseSquare(button.dataset.square); });
+$('#chess-board').addEventListener('pointerdown', startPointer);
+window.addEventListener('pointermove', movePointer, { passive: false });
+window.addEventListener('pointerup', endPointer);
+window.addEventListener('pointercancel', event => { if (pointerDrag?.id === event.pointerId) cancelDrag(); });
+$('#chess-board').addEventListener('lostpointercapture', event => { if (event.target === $('#chess-board') && pointerDrag?.id === event.pointerId) cancelDrag(); });
+$('#chess-board').addEventListener('dragstart', event => event.preventDefault());
+$('#chess-board').addEventListener('click', event => {
+  if (event.detail && performance.now() < suppressBoardClickUntil) { event.preventDefault(); return; }
+  const button = event.target.closest('[data-square]'); if (button) chooseSquare(button.dataset.square);
+});
 $('#chess-board').addEventListener('keydown', event => {
   const buttons = [...$('#chess-board').children]; const index = buttons.indexOf(event.target);
   const offset = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -8, ArrowDown: 8 }[event.key];
@@ -300,7 +386,7 @@ $('#first-move').addEventListener('click', () => setView(0));
 $('#previous-move').addEventListener('click', () => setView(shownPly() - 1));
 $('#next-move').addEventListener('click', () => setView(shownPly() + 1));
 $('#last-move').addEventListener('click', () => setView(game?.ply || 0));
-$('#flip-board').addEventListener('click', () => { flipped = !flipped; renderBoard(); });
+$('#flip-board').addEventListener('click', () => { clearSelection(); flipped = !flipped; renderBoard(); });
 $('#sync-game').addEventListener('click', () => { if (!busy) atLivePosition() ? loadCurrent({ force: true }) : returnLive(); });
 $('#return-live').addEventListener('click', returnLive);
 $('#promotion-options').addEventListener('click', event => { const choice = event.target.closest('[data-promotion]'); if (!choice || !pendingMove) return; const candidate = { ...pendingMove, promotion: choice.dataset.promotion }; $('#promotion-dialog').close(); pendingMove = null; considerMove(candidate); });
@@ -321,11 +407,12 @@ $('#download-pgn').addEventListener('click', () => {
   const link = document.createElement('a'); link.href = url; link.download = `salieri-chess-${game.id}.pgn`; link.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 });
-document.addEventListener('visibilitychange', () => { if (!document.hidden && atLivePosition() && !busy) loadCurrent({ silent: true }); });
-window.addEventListener('focus', () => { if (!document.hidden && atLivePosition() && !busy && !pendingMove) loadCurrent({ silent: true }); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) cancelDrag(); else if (atLivePosition() && !busy && !pointerDrag) loadCurrent({ silent: true }); });
+window.addEventListener('blur', cancelDrag);
+window.addEventListener('focus', () => { if (!document.hidden && atLivePosition() && !busy && !pendingMove && !pointerDrag) loadCurrent({ silent: true }); });
 render();
 const requested = new URLSearchParams(location.search).get('game');
 if (requested && /^[1-9]\d{0,14}$/.test(requested)) await viewGame(Number(requested));
 else await loadCurrent({ force: true });
 loadHistory();
-setInterval(() => { if (!document.hidden && atLivePosition() && !busy && !pendingMove) loadCurrent({ silent: true }); }, 30000);
+setInterval(() => { if (!document.hidden && atLivePosition() && !busy && !pendingMove && !pointerDrag) loadCurrent({ silent: true }); }, 30000);
