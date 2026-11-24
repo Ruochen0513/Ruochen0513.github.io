@@ -5,7 +5,7 @@ on:
     branches:
       - main
   schedule:
-    # GitHub Actions cron uses UTC. 19:00 UTC is 03:00 Asia/Shanghai.
+    # UTC 19:00，即北京时间次日 03:00
     - cron: "0 19 * * *"
   workflow_dispatch:
 
@@ -21,9 +21,6 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -55,8 +52,18 @@ jobs:
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
         with:
+          name: github-pages
           path: .
 
+  deploy:
+    needs: update
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - name: Deploy GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          artifact_name: github-pages
